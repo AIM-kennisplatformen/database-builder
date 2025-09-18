@@ -1,0 +1,78 @@
+[project]
+authors = ["Hoog-V <hogeweyv@gmail.com>"]
+name = "database-builder"
+channels = ["https://fast.prefix.dev/conda-forge", "https://repo.prefix.dev/pypdfium2-public", "https://repo.prefix.dev/pytorch"]
+platforms = ["linux-64", "osx-64", "osx-arm64"]
+preview = ["pixi-build"]
+
+[dependencies]
+pip = "*"
+python = "3.12.*"
+python-dotenv = "*"
+linkify-it-py = "2.0.3.*"
+loguru-mypy = "0.0.4.*"
+mdformat-footnote = "0.1.1.*"
+mdformat-frontmatter = "2.0.8.*"
+mdformat-gfm = "0.4.1.*"
+mdformat-pyproject = "0.0.2.*"
+mdformat-shfmt = "0.2.0.*"
+mdformat-tables = "1.0.0.*"
+mdformat = "0.7.22.*"
+mypy = "1.15.0.*"
+nbconvert = "7.16.6.*"
+packaging = "24.2.*"
+pandas-stubs = "2.2.3.250308.*"
+pydantic = "2.10.6.*"
+pydeps = "3.0.1.*"
+pytest-profiling = "1.8.1.*"
+pytest-xdist = "3.6.1.*"
+pytest = "8.3.5.*"
+ruff = "0.9.10.*"
+ssort = "0.14.0.*"
+tinycss2 = "1.4.0.*"
+types-openpyxl = "3.1.5.20241225.*"
+types-requests = "2.32.0.20241016.*"
+compilers = "*"
+pkg-config = "*"
+ninja = "*"
+rattler-build = "*"
+black = "25.1.0.*"
+cibuildwheel = "2.23.0.*"
+coverage = "7.6.12.*"
+creosote = "4.0.1.*"
+debugpy = "1.8.13.*"
+isort = "6.0.1.*"
+lefthook = "1.11.8.*"
+anyio = "*"
+fastapi = "*"
+openai = "*"
+qdrant-client = "1.13.3.*"
+pyarrow = "20.*"
+scikit-learn = ">=1.7.0,<2"
+docling = "*"
+sentence-transformers = "3.4.1.*"
+spacy = "*"
+
+[activation.env]
+PYTHONNOUSERSITE = "1"
+LD_LIBRARY_PATH = "$CONDA_PREFIX/lib:$LD_LIBRARY_PATH" 
+
+
+[pypi-dependencies]
+lingua-language-detector = "==2.1.0"
+typedb-driver = "==2.29.2"
+span-marker = "==1.7.0"
+langfuse = "*"
+unidecode = "*"
+asapi = "*"
+azure-identity = "*"
+microsoft-kiota-authentication-azure = "*"
+msgraph-sdk = "*"
+pathvalidate = "*"
+
+[target.linux-64.dependencies]
+python-devtools = "*"         # Optional but useful
+#cuda-toolkit = "12.9.0.*" # For use with cuda
+
+[target.linux-64.tasks]
+vscode = 'env -u LD_LIBRARY_PATH code .'

@@ -1,0 +1,9 @@
+[
+  {
+    "attributes": ["projecttypecode"],
+    "index_row": 2,
+    "input": null,
+    "message": "Input should be a valid string",
+    "type": "string_type"
+  }
+]

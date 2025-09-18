@@ -1,0 +1,8 @@
+match
+    $person isa person, has namelike-first $namelike-first, has namelike-last $namelike-last, has namelike-id-employee $namelike-id-employee;
+    $timesheet (charges-hours: $subproject, books-hours: $person) isa $t;
+    {$t type hours-booked;} or {$t type hours-projected;};
+fetch
+    $person: namelike-first as namelike_first, namelike-last as namelike_last, namelike-id-employee as namelike_id_employee;
+    $subproject: namelike-id-ubw as namelike_id_ubw, namelike-name as namelike_name, projectclassifier-financial as projectclassifier_financial;
+    $timesheet: billable, date-event-registration as date_event_registration, timesheets-hours as timesheets_hours;

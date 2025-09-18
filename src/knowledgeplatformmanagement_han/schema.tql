@@ -1,0 +1,441 @@
+define
+confidence sub attribute,
+    value double;
+datetime-end-recorded sub attribute,
+    value datetime;
+datetime-end-updated sub attribute,
+    value datetime;
+dummy sub attribute,
+    value long;
+provenant-boolean sub attribute,
+    abstract,
+    value boolean,
+    owns confidence,
+    owns datetime-end-recorded,
+    owns datetime-end-updated,
+    owns source;
+billable sub provenant-boolean,
+    value boolean;
+provenant-datetime sub attribute,
+    abstract,
+    value datetime,
+    owns confidence,
+    owns datetime-end-recorded,
+    owns datetime-end-updated,
+    owns source;
+date-event sub provenant-datetime,
+    abstract,
+    value datetime,
+    plays datacollection:queryattribute;
+date-event-end sub date-event,
+    value datetime;
+date-event-registration sub date-event,
+    value datetime;
+date-event-start sub date-event,
+    value datetime;
+provenant-double sub attribute,
+    abstract,
+    value double,
+    owns confidence,
+    owns datetime-end-recorded,
+    owns datetime-end-updated,
+    owns source;
+employmentcontract-ftepercentage sub provenant-double,
+    value double;
+financialquantifier sub provenant-double,
+    abstract,
+    value double,
+    plays datacollection:queryattribute;
+budget sub financialquantifier,
+    value double;
+timesheets sub provenant-double,
+    abstract,
+    value double,
+    plays datacollection:queryattribute;
+timesheets-hours sub timesheets,
+    value double;
+provenant-long sub attribute,
+    abstract,
+    value long,
+    owns confidence,
+    owns datetime-end-recorded,
+    owns datetime-end-updated,
+    owns source;
+hashvalue sub provenant-string,
+    value string;
+weeknumber sub provenant-long,
+    value long;
+provenant-string sub attribute,
+    abstract,
+    value string,
+    owns confidence,
+    owns datetime-end-recorded,
+    owns datetime-end-updated,
+    owns source;
+address sub provenant-string,
+    abstract,
+    value string,
+    regex ".+",
+    plays datacollection:queryattribute;
+address-email sub address,
+    value string,
+    regex "^[a-z0-9_!#$%&’*+\/=?`{|}~^.-]+@[a-z0-9.-]+$";
+address-url sub address,
+    value string,
+    regex "^.+:.+$";
+description sub provenant-string,
+    value string,
+    regex ".+",
+    plays datacollection:queryattribute;
+function sub provenant-string,
+    value string,
+    plays datacollection:queryattribute;
+geocode sub provenant-string,
+    abstract,
+    value string,
+    plays datacollection:queryattribute;
+geocode-country sub geocode,
+    value string,
+    regex ".+";
+geocode-nationality sub geocode,
+    value string,
+    regex ".+";
+interests sub provenant-string,
+    value string,
+    regex ".+";
+keyarea sub provenant-string,
+    value string,
+    regex "^(schoon|slim|sociaal)$",
+    plays topical-keyarea:topic-keyarea;
+legalform sub provenant-string,
+    abstract,
+    value string,
+    plays datacollection:queryattribute;
+legalform-bel sub legalform,
+    value string,
+    regex ".+";
+legalform-deu sub legalform,
+    value string,
+    regex ".+";
+legalform-fra sub legalform,
+    value string,
+    regex ".+";
+legalform-irl sub legalform,
+    value string,
+    regex ".+";
+legalform-nld sub legalform,
+    value string,
+    regex "^(eenmanszaak|vennootschaponderfirma|beslotenvennootschap|maatschap|naamlozevennootschap|commanditairevennootschap|verenigingmetvolledigerechtsbevoegdheid|verenigingmetbeperkterechtsbevoegdheid|coöperatie|stichting)$";
+namelike sub provenant-string,
+    abstract,
+    value string,
+    plays datacollection:queryattribute;
+namelike-alias sub namelike,
+    value string,
+    regex ".+";
+namelike-department sub namelike,
+    value string,
+    regex ".+";
+namelike-first sub namelike,
+    value string,
+    regex ".+";
+namelike-id sub namelike,
+    abstract,
+    value string;
+namelike-id-employee sub namelike-id,
+    value string,
+    regex "^(\d+|999-.+ .+|[A-Z]+)$";
+namelike-id-grant sub namelike-id,
+    value string,
+    regex ".+";
+namelike-id-school sub namelike-id,
+    value string,
+    regex "^\d+$";
+namelike-id-ubw sub namelike-id,
+    value string,
+    regex "^[a-zA-ZÌ]{2,3}[0-9]{3,6}[\-]{0,1}[0-9]{0,3}$";
+namelike-id-ubwcostcentre sub namelike-id,
+    value string,
+    regex "^\d+$";
+namelike-last sub namelike,
+    value string,
+    regex ".+";
+namelike-name sub namelike,
+    value string,
+    regex ".+";
+namelike-prefix sub namelike,
+    value string,
+    regex ".+";
+namelike-title sub namelike,
+    value string,
+    regex ".+";
+projectclassifier sub provenant-string,
+    abstract,
+    value string,
+    plays datacollection:queryattribute;
+projectclassifier-financial sub projectclassifier,
+    value string,
+    regex "^(marktactiviteiten|onderzoekmarkt|subsidieprojecten|balansproject|contractonderwijs|interne-marktprojecten|interne-publiekeprojecten|interne-publiekeprojecten|administratie-samenwerkingsverbanden|intern-declarabel|rijksbijdrage)$",
+    owns description,
+    owns namelike-prefix;
+projectclassifier-status sub projectclassifier,
+    value string,
+    regex "^(smfseed|smfmatching|ongoing|completed)$";
+querycode sub provenant-string,
+    value string,
+    regex ".+",
+    plays datacollection:queryattribute;
+question sub provenant-string,
+    value string,
+    regex ".+",
+    plays datacollection:queryattribute;
+responsibilities sub provenant-string,
+    value string,
+    regex ".+";
+schools sub provenant-string,
+    value string,
+    regex ".+";
+skills sub provenant-string,
+    value string,
+    regex ".+";
+topic sub provenant-string,
+    value string,
+    regex ".+",
+    plays topical:topic;
+source sub attribute,
+    value string,
+    regex "^(microsoft365|ubwfris|documents)$";
+attribution sub relation,
+    relates attributed,
+    relates attributedto;
+categorization sub relation,
+    abstract,
+    relates category,
+    relates pertainsto;
+composition sub relation,
+    abstract,
+    relates composedby,
+    relates composes;
+composition-organizational sub composition,
+    relates organizationalunit as composes,
+    relates overarchingunit as composedby;
+composition-project sub composition,
+    relates overarchingproject as composedby,
+    relates projectpart as composes;
+datacollection sub relation,
+    relates datacollectionmethod,
+    relates queryattribute,
+    relates source;
+employment sub relation,
+    relates employed-by,
+    relates employs;
+funding sub relation,
+    abstract,
+    relates funder,
+    relates fundingproject,
+    relates plan,
+    relates recipient;
+funding-external sub funding,
+    owns namelike-id-grant,
+    relates recipient-institute as recipient,
+    relates subsidyprovider as funder;
+funding-internal sub funding,
+    relates component-funding as funder,
+    relates recipient-component as recipient;
+informationquestion sub relation,
+    owns question,
+    relates asksinformation,
+    relates structuresinformation;
+manufactured sub relation,
+    relates manufacturedby,
+    relates manufactures;
+objectification sub relation,
+    abstract,
+    relates concept,
+    relates object;
+objectification-expertise sub objectification,
+    relates conceptofexpertise as concept,
+    relates objectofexpertise as object;
+objectification-interest sub objectification,
+    relates conceptofinterest as concept,
+    relates objectofinterest as object;
+projectpartnership sub relation,
+    abstract,
+    relates consortium,
+    relates leadpartner,
+    relates partner;
+participationexternal sub projectpartnership,
+    plays leadingmanagement:leadingmanagingpartner;
+participationinternal sub projectpartnership,
+    relates internallycooperatingcomponents as consortium,
+    relates leadingcomponent as leadpartner,
+    relates partnercomponent as partner,
+    plays internalleadingmanagement:leadingmanagingcomponent;
+projectrole sub relation,
+    abstract,
+    relates contributedto,
+    relates contributor;
+financialcontrol sub projectrole,
+    relates controlledproject as contributedto,
+    relates financialcontroller as contributor;
+leadingmanagement sub projectrole,
+    relates leadingmanager as contributor,
+    relates leadingmanagingpartner,
+    relates managedproject as contributedto;
+internalleadingmanagement sub leadingmanagement,
+    relates leadingmanagingcomponent as leadingmanagingpartner;
+projectmanagement sub projectrole,
+    relates managedsubproject as contributedto,
+    relates projectmanager as contributor;
+research sub projectrole,
+    relates contributedexpertise,
+    relates researcher as contributor;
+timesheet sub relation,
+    abstract,
+    owns billable,
+    owns date-event-registration,
+    owns timesheets-hours,
+    relates books-hours,
+    relates charges-hours;
+hours-booked sub timesheet;
+hours-budgeted sub timesheet,
+    relates budgets-hours as books-hours;
+hours-projected sub timesheet,
+    relates projects-hours as books-hours;
+hours-remaining sub timesheet,
+    relates remains-hours as books-hours;
+topical sub relation,
+    abstract,
+    relates agent,
+    relates topic;
+topical-keyarea sub topical,
+    relates topic-keyarea as topic,
+    plays topical:topic;
+component sub entity,
+    abstract,
+    owns description,
+    owns namelike-name;
+component-institution sub component,
+    abstract,
+    plays composition-organizational:organizationalunit,
+    plays composition-organizational:overarchingunit,
+    plays funding-internal:component-funding,
+    plays funding-internal:recipient-component,
+    plays participationinternal:leadingcomponent,
+    plays participationinternal:partnercomponent;
+component-institution-universityofappliedsciences sub component-institution,
+    abstract;
+centreofexpertise sub component-institution-universityofappliedsciences;
+keyareateam sub component-institution-universityofappliedsciences;
+researchdepartment sub component-institution-universityofappliedsciences;
+school sub component-institution-universityofappliedsciences,
+    owns namelike-id-school @key,
+    owns namelike-department;
+component-project sub component,
+    abstract;
+datacollectionmethod sub entity,
+    owns description,
+    plays datacollection:datacollectionmethod;
+query sub datacollectionmethod,
+    owns querycode;
+questionnaire sub datacollectionmethod,
+    owns address-url,
+    owns question;
+discriminatingconcept sub entity,
+    abstract,
+    plays attribution:attributed,
+    plays informationquestion:structuresinformation;
+discriminatingconcept-personally sub discriminatingconcept;
+expertise sub discriminatingconcept-personally,
+    plays objectification-expertise:conceptofexpertise,
+    plays research:contributedexpertise;
+interest sub discriminatingconcept-personally,
+    plays objectification-interest:conceptofinterest;
+discriminatingconcept-project sub discriminatingconcept;
+domain sub discriminatingconcept-project;
+theme sub discriminatingconcept-project;
+document sub entity,
+    owns hashvalue @key,
+    owns namelike-name;
+proposal sub document;
+fundingplan sub entity,
+    owns description,
+    owns namelike-name,
+    plays funding:plan;
+informationpersona sub entity,
+    owns description,
+    owns namelike-name,
+    plays informationquestion:asksinformation;
+institution sub entity,
+    abstract,
+    owns namelike-name @key,
+    owns legalform-bel,
+    owns legalform-deu,
+    owns legalform-fra,
+    owns legalform-irl,
+    owns legalform-nld,
+    plays composition-organizational:overarchingunit,
+    plays composition:composedby,
+    plays employment:employs,
+    plays funding-external:subsidyprovider,
+    plays projectpartnership:leadpartner,
+    plays projectpartnership:partner;
+knowledgeinstitution sub institution,
+    abstract;
+researchuniversity sub knowledgeinstitution;
+universityofappliedsciences sub knowledgeinstitution;
+objectset sub entity,
+    abstract,
+    plays objectification:object;
+softwarelike sub objectset,
+    owns namelike-name,
+    plays manufactured:manufacturedby,
+    plays objectification-expertise:objectofexpertise,
+    plays objectification-interest:objectofinterest;
+person sub entity,
+    owns address-email @key,
+    owns employmentcontract-ftepercentage,
+    owns geocode-nationality,
+    owns interests,
+    owns namelike-first,
+    owns namelike-id-employee,
+    owns namelike-id-ubwcostcentre,
+    owns namelike-last,
+    owns responsibilities,
+    owns schools,
+    owns skills,
+    plays attribution:attributedto,
+    plays hours-budgeted:budgets-hours,
+    plays hours-projected:projects-hours,
+    plays hours-remaining:remains-hours,
+    plays projectmanagement:projectmanager,
+    plays projectrole:contributor,
+    plays timesheet:books-hours;
+projectlike sub entity,
+    abstract,
+    owns namelike-id-ubw @key,
+    owns budget,
+    owns date-event-end,
+    owns date-event-start,
+    owns description,
+    owns namelike-id-ubwcostcentre,
+    owns namelike-name,
+    owns projectclassifier-financial,
+    owns projectclassifier-status,
+    plays attribution:attributedto,
+    plays composition-project:overarchingproject,
+    plays funding:fundingproject,
+    plays participationinternal:internallycooperatingcomponents,
+    plays projectpartnership:consortium,
+    plays projectrole:contributedto,
+    plays timesheet:charges-hours,
+    plays topical:agent;
+educationalproject sub projectlike;
+learningcommunity sub projectlike;
+operationalproject sub projectlike;
+researchproject sub projectlike;
+strategicpartnership sub projectlike;
+subproject sub projectlike,
+    plays composition-project:projectpart,
+    plays projectmanagement:managedsubproject;
+unclearproject sub projectlike;

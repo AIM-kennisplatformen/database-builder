@@ -1,0 +1,292 @@
+[
+  {
+    "billable": false,
+    "date": "2024-11-01",
+    "hours_type": "hours-projected",
+    "hours": 12.56,
+    "namelike_id_employee": "999-Adfas afdAA",
+    "namelike_id_ubw": "ÌD1123",
+    "namelike_name": "dj33289jdhceuwijcsiova dSDS # 23 asaas",
+    "project_type_name_powerbi": "Intern Declarabel"
+  },
+  {
+    "billable": true,
+    "date": "2024-01-26",
+    "hours_type": "hours-booked",
+    "hours": 4.35,
+    "namelike_id_employee": "30936290",
+    "namelike_id_ubw": "SUP45937-189",
+    "namelike_name": "cFMltOSmSMMdCoMdwJZqChUHwpBgimMz",
+    "project_type_name_powerbi": "Subsidieprojecten"
+  },
+  {
+    "billable": true,
+    "date": "2024-01-30",
+    "hours_type": "hours-booked",
+    "hours": 1.61,
+    "namelike_id_employee": "33593640",
+    "namelike_id_ubw": "AS065-196",
+    "namelike_name": "PilTzt PIdVxFxsBVtZOxfDDpvWA MVvYOAS",
+    "project_type_name_powerbi": "Intern Declarabel"
+  },
+  {
+    "billable": true,
+    "date": "2024-02-13",
+    "hours_type": "hours-booked",
+    "hours": 8.15,
+    "namelike_id_employee": "27697",
+    "namelike_id_ubw": "MA760160-108",
+    "namelike_name": "UPD YTGlpXRrB SlEp",
+    "project_type_name_powerbi": "Subsidieprojecten"
+  },
+  {
+    "billable": true,
+    "date": "2024-02-18",
+    "hours_type": "hours-booked",
+    "hours": 2.12,
+    "namelike_id_employee": "50499085",
+    "namelike_id_ubw": "IN54857-128",
+    "namelike_name": "GoffgkccD mocCC NOENORSgwFY HKDYpnaUTcPb",
+    "project_type_name_powerbi": "Marktactiviteiten"
+  },
+  {
+    "billable": true,
+    "date": "2024-02-25",
+    "hours_type": "hours-booked",
+    "hours": 2.94,
+    "namelike_id_employee": "67893905",
+    "namelike_id_ubw": "BA691-141",
+    "namelike_name": "pFskvbaEZiolnXxzUPX",
+    "project_type_name_powerbi": "Marktactiviteiten"
+  },
+  {
+    "billable": true,
+    "date": "2024-03-01",
+    "hours_type": "hours-booked",
+    "hours": 4.37,
+    "namelike_id_employee": "94221224",
+    "namelike_id_ubw": "KP8591-131",
+    "namelike_name": "rnDwfpVCyckrhPWchGwvsAYQvwOvsNSxlTSCUXWDtJDegMobsXihGVDrRFKJrBZlJROitxEVPtup",
+    "project_type_name_powerbi": "Interne Marktprojecten"
+  },
+  {
+    "billable": true,
+    "date": "2024-03-08",
+    "hours_type": "hours-booked",
+    "hours": 5.43,
+    "namelike_id_employee": "50395",
+    "namelike_id_ubw": "SU348-193",
+    "namelike_name": "ASgfKBfXHNmTLETBXmIAXbHKVLQNaSiKPWYH",
+    "project_type_name_powerbi": "Subsidieprojecten"
+  },
+  {
+    "billable": true,
+    "date": "2024-03-19",
+    "hours_type": "hours-booked",
+    "hours": 4.58,
+    "namelike_id_employee": "26735",
+    "namelike_id_ubw": "ÌD37966-185",
+    "namelike_name": "rVlZfixZpIoocbqmdHiieKeRjkyINEhDPxsyZdXOudGxclCjuDHnwfuseelyRcbXYGFFHVgwajIy",
+    "project_type_name_powerbi": "Intern Declarabel"
+  },
+  {
+    "billable": true,
+    "date": "2024-03-20",
+    "hours_type": "hours-booked",
+    "hours": 3.48,
+    "namelike_id_employee": "66518125",
+    "namelike_id_ubw": "KP67660-125",
+    "namelike_name": "kTHuJ HukfySP moCjytwFWNzxZJDEjZaUKZS UW PxPGUph",
+    "project_type_name_powerbi": "Intern Declarabel"
+  },
+  {
+    "billable": true,
+    "date": "2024-04-05",
+    "hours_type": "hours-booked",
+    "hours": 7.83,
+    "namelike_id_employee": "67243836",
+    "namelike_id_ubw": "CO1569-105",
+    "namelike_name": "Oau NMlVqGtcKXnfhkeeLkXcxLNKwXqhK zmgiMIKYVwftVRJqE",
+    "project_type_name_powerbi": "Marktactiviteiten"
+  },
+  {
+    "billable": true,
+    "date": "2024-05-05",
+    "hours_type": "hours-booked",
+    "hours": 0.36,
+    "namelike_id_employee": "92758498",
+    "namelike_id_ubw": "KP0533-189",
+    "namelike_name": "lhNWihW",
+    "project_type_name_powerbi": "Subsidieprojecten"
+  },
+  {
+    "billable": true,
+    "date": "2024-05-17",
+    "hours_type": "hours-booked",
+    "hours": 0.42,
+    "namelike_id_employee": "40061",
+    "namelike_id_ubw": "IM44514-118",
+    "namelike_name": "bYCFmhDaECxhjjFegwo",
+    "project_type_name_powerbi": "Intern Declarabel"
+  },
+  {
+    "billable": true,
+    "date": "2024-06-06",
+    "hours_type": "hours-booked",
+    "hours": 4.93,
+    "namelike_id_employee": "59306",
+    "namelike_id_ubw": "KP40799-200",
+    "namelike_name": "PHpsQUzPntjBCHeIQnxCNLbJ",
+    "project_type_name_powerbi": "Intern Declarabel"
+  },
+  {
+    "billable": true,
+    "date": "2024-06-19",
+    "hours_type": "hours-booked",
+    "hours": 5.79,
+    "namelike_id_employee": "36939",
+    "namelike_id_ubw": "ÌD870743-106",
+    "namelike_name": "dHTSnVIbHSvrCKTagQJkvmNfhWg KTcRP VFweSgwLSbr",
+    "project_type_name_powerbi": "Marktactiviteiten"
+  },
+  {
+    "billable": true,
+    "date": "2024-07-24",
+    "hours_type": "hours-booked",
+    "hours": 1.11,
+    "namelike_id_employee": "46430908",
+    "namelike_id_ubw": "SUP887-199",
+    "namelike_name": "RtFuEkdJMhViJBBfmefVnhAUYlFwGFZvfCiMQycOjoXGhujvGtyqZhvCHmTDbAcIEnBSZFHAyoD",
+    "project_type_name_powerbi": "Interne Marktprojecten"
+  },
+  {
+    "billable": true,
+    "date": "2024-07-25",
+    "hours_type": "hours-booked",
+    "hours": 4.09,
+    "namelike_id_employee": "14849864",
+    "namelike_id_ubw": "MA2903-117",
+    "namelike_name": "cNPstjCXIAkkJNtSg",
+    "project_type_name_powerbi": "Interne Marktprojecten"
+  },
+  {
+    "billable": true,
+    "date": "2024-07-28",
+    "hours_type": "hours-booked",
+    "hours": 1.07,
+    "namelike_id_employee": "50044",
+    "namelike_id_ubw": "CO156305-191",
+    "namelike_name": "CBpxyRQFgiPhuUUypLTNnMBSjuHbyiFNbZT",
+    "project_type_name_powerbi": "Intern Declarabel"
+  },
+  {
+    "billable": true,
+    "date": "2024-08-08",
+    "hours_type": "hours-booked",
+    "hours": 9.0,
+    "namelike_id_employee": "68216",
+    "namelike_id_ubw": "MA793776-143",
+    "namelike_name": "haKjvSpiMWTRonTcmrjubPOPnJK",
+    "project_type_name_powerbi": "Contractonderwijs"
+  },
+  {
+    "billable": true,
+    "date": "2024-08-14",
+    "hours_type": "hours-booked",
+    "hours": 2.58,
+    "namelike_id_employee": "06576911",
+    "namelike_id_ubw": "SUP760031-141",
+    "namelike_name": "evDjfkZCkUZwEyfXpwlMHMBf",
+    "project_type_name_powerbi": "Marktactiviteiten"
+  },
+  {
+    "billable": true,
+    "date": "2024-08-14",
+    "hours_type": "hours-booked",
+    "hours": 8.89,
+    "namelike_id_employee": "43148",
+    "namelike_id_ubw": "AS247-132",
+    "namelike_name": "qOOXWtZoAbOyPBuZuadAGrowfbOjHnQaTmFotA",
+    "project_type_name_powerbi": "Intern Declarabel"
+  },
+  {
+    "billable": true,
+    "date": "2024-09-08",
+    "hours_type": "hours-booked",
+    "hours": 6.62,
+    "namelike_id_employee": "49942",
+    "namelike_id_ubw": "MA593-105",
+    "namelike_name": "aQlQINjdpWcRsUynxSqJiUPLVUlvzPvlMHESfJeJgT l BrcEnh",
+    "project_type_name_powerbi": "Subsidieprojecten"
+  },
+  {
+    "billable": true,
+    "date": "2024-09-16",
+    "hours_type": "hours-booked",
+    "hours": 1.87,
+    "namelike_id_employee": "03764001",
+    "namelike_id_ubw": "AS6566-101",
+    "namelike_name": "gmDYYxhkEDFoTxtecFtRFylNQwlpuIkibFThKUQplWyQjZIxUwCjXowEJ",
+    "project_type_name_powerbi": "Subsidieprojecten"
+  },
+  {
+    "billable": true,
+    "date": "2024-09-25",
+    "hours_type": "hours-booked",
+    "hours": 0.75,
+    "namelike_id_employee": "73234093",
+    "namelike_id_ubw": "BA497-196",
+    "namelike_name": "uIFsmFOdxvMqgHTROj",
+    "project_type_name_powerbi": "Intern Declarabel"
+  },
+  {
+    "billable": true,
+    "date": "2024-10-06",
+    "hours_type": "hours-booked",
+    "hours": 2.73,
+    "namelike_id_employee": "76171",
+    "namelike_id_ubw": "KP9107-116",
+    "namelike_name": "vkKLeAXRECFfrZrvGNswFpOeQOoSiKdrAejrvgeSXsSBjRT",
+    "project_type_name_powerbi": "Marktactiviteiten"
+  },
+  {
+    "billable": true,
+    "date": "2024-10-16",
+    "hours_type": "hours-booked",
+    "hours": 3.1,
+    "namelike_id_employee": "13878142",
+    "namelike_id_ubw": "AS442248-197",
+    "namelike_name": "lCXrmhKXYCcqFoPXNdjkufiIZwcX J",
+    "project_type_name_powerbi": "Intern Declarabel"
+  },
+  {
+    "billable": true,
+    "date": "2024-10-29",
+    "hours_type": "hours-booked",
+    "hours": 3.34,
+    "namelike_id_employee": "25832",
+    "namelike_id_ubw": "ÌD028-124",
+    "namelike_name": "FbHiKDOfezkpfZTNabldRbibIZx",
+    "project_type_name_powerbi": "Interne Marktprojecten"
+  },
+  {
+    "billable": true,
+    "date": "2024-11-01",
+    "hours_type": "hours-booked",
+    "hours": 7.26,
+    "namelike_id_employee": "78493",
+    "namelike_id_ubw": "IM461733-110",
+    "namelike_name": "LWylCvcdjVEihwUiYnphsYTjegYVVRHhNmHzvFdlIOlkN",
+    "project_type_name_powerbi": "Intern Declarabel"
+  },
+  {
+    "billable": true,
+    "date": "2024-11-04",
+    "hours_type": "hours-booked",
+    "hours": 5.25,
+    "namelike_id_employee": "62782876",
+    "namelike_id_ubw": "CO878-164",
+    "namelike_name": "kzKIzmSNEsbOJWWSmfYdrlxUVHzgefbWxLPLJXeCQoiQfjxdxIHiUxmxpINYWdaldzSbWnOts hXn",
+    "project_type_name_powerbi": "Intern Declarabel"
+  }
+]

@@ -1,0 +1,7 @@
+match
+$x sub thing;
+not {$x sub namelike-id;}; not {$x sub description;};
+#not {$x sub attribute;};
+#not {$x sub project-division;};
+get $x;
+

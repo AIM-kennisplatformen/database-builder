@@ -1,0 +1,18 @@
+match 
+$x sub attribute; 
+$supertypes-entity sub! entity;
+institution sub $supertypes-entity; 
+$entity-types sub $supertypes-entity; 
+$entity-types plays $roles;
+$relations relates $roles; 
+$relations sub $rel; 
+$relations relates $rol; 
+$rel relates $rol; 
+
+$ent sub entity; 
+
+$ent plays $rol;
+
+
+get $entity-types, $relations, $ent, $rel;
+#get $rel, $relations;

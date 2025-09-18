@@ -1,0 +1,6 @@
+match
+$relationship sub hour-allocation; #name of relation
+$entities sub entity;
+$relationship relates $roles;
+$entities plays $roles;
+get $relationship, $entities;
