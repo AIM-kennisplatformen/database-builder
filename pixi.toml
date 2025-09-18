@@ -76,3 +76,11 @@ python-devtools = "*"         # Optional but useful
 
 [target.linux-64.tasks]
 vscode = 'env -u LD_LIBRARY_PATH code .'
+
+[target.osx.tasks]
+vscode = 'env -u LD_LIBRARY_PATH code .'
+
+[target.osx-arm64.tasks]
+vscode = 'env -u LD_LIBRARY_PATH code .'
+
+
