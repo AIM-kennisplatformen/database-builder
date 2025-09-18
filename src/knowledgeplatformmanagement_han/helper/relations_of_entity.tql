@@ -1,0 +1,14 @@
+#match
+#$projects sub projectlike;
+#$projects relates $relationship; 
+#$relationship (role: $projects, $related-role: $related-entity) isa relation;
+#$relationship has $attribute;
+#$relation sub funding;
+#$a sub funding; 
+#get $relationship, $related-entity, $related-role, $attribute;
+#get $projects, $relationship;
+match 
+$x sub relation;
+$z sub entity;
+$y sub role;
+get $x, $y, $z;

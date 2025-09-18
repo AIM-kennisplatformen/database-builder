@@ -1,0 +1,3 @@
+define dummy sub attribute, value long;
+
+insert $d 0 isa dummy;

@@ -1,0 +1,4 @@
+match
+    $person isa person;
+fetch
+    $person:namelike-id-employee as namelike_id_employee, namelike-first as namelike_first, namelike-last as namelike_last, employmentcontract-ftepercentage as employmentcontract_ftepercentage, namelike-id-ubwcostcentre as namelike_id_ubwcostcentre;

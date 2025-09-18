@@ -1,0 +1,10 @@
+match
+$projects sub projectlike;
+$x sub relation;
+$x relates $z;
+$projects plays $z;
+
+#$relations sub relation; 
+#$relations relates $z;
+
+get $x, $projects;
