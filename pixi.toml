@@ -59,6 +59,7 @@ azure-identity = "*"
 microsoft-kiota-authentication-azure = "*"
 msgraph-sdk = "*"
 pathvalidate = "*"
+lychee = "*"
 
 [target.linux-64.dependencies]
 python-devtools = "*"         # Optional but useful
@@ -73,4 +74,8 @@ vscode = 'env -u LD_LIBRARY_PATH code .'
 [target.osx-arm64.tasks]
 vscode = 'env -u LD_LIBRARY_PATH code .'
 
-
+[tasks]
+lint = "ruff check"
+typecheck = "mypy ."
+test = "pytest -q"
+lefthook-ci = "lefthook run ci"
