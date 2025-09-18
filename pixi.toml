@@ -60,6 +60,7 @@ microsoft-kiota-authentication-azure = "*"
 msgraph-sdk = "*"
 pathvalidate = "*"
 lychee = "*"
+mypy = "*"
 
 [target.linux-64.dependencies]
 python-devtools = "*"         # Optional but useful
