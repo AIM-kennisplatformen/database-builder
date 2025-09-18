@@ -27,13 +27,3 @@ pre-commit:
     notebooktester:
       glob: '*.ipynb'
       run: notebooktester notebooks -v -t 150
-# CI group: operate on the whole repo (no {staged_files})
-ci:
-  parallel: true
-  commands:
-    lint:
-      run: pixi run lint
-    typecheck:
-      run: pixi run typecheck
-    test:
-      run: pixi run test
