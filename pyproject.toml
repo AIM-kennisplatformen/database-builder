@@ -40,6 +40,10 @@ disable_error_code = [
     "call-overload"
 ]
 pretty = true
+exclude = [
+    "^\\.pixi/",  # ignore the .pixi folder at repo root
+]
+
 
 
 [tool.ruff.lint]
