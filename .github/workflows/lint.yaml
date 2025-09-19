@@ -19,5 +19,5 @@ jobs:
       - name: Run Lefthook CI group (Pixi env)
         run: |
           # lockfile-precise install+run:
-          pixi run lint
+          pixi run -e development lint
         shell: pixi run bash -e {0}
