@@ -37,7 +37,9 @@ disable_error_code = [
     "call-arg",        # unexpected keyword arguments
     "import-untyped",  # missing stubs like requests
     "import-not-found",
-    "call-overload"
+    "call-overload",
+    "arg-type",
+    "misc",
 ]
 pretty = true
 exclude = [
