@@ -1,38 +1,74 @@
+# -----------------------------
+# Build system
+# -----------------------------
 [build-system]
 build-backend = "hatchling.build"
 requires = ["hatchling==1.27.0"]
 
+# -----------------------------
+# Dependency groups (PEP 735)
+# -----------------------------
 [dependency-groups]
 dev = [
+  "pip",
+  "pydantic",
+  "pytest-profiling",
+  "pytest-xdist",
+  "pytest",
+  "ruff",
+  "ssort",
+  "creosote",
+  "debugpy",
+  "lefthook",
+  "mypy",
+  "lychee",
+  "pandas-stubs",
+  "types-requests",
+  "types-openpyxl"
 ]
 
+# -----------------------------
+# Project metadata + PyPI runtime deps
+# -----------------------------
 [project]
+name = "Database-builder"
+description = "Knowledge Platform Management App library"
+readme = "README.md"
+license = { text = "NONE" }
 authors = [
-  {email = "Sander.Maijers@han.nl", name = "Sander Maijers"},
+  { name = "Sander Maijers", email = "Sander.Maijers@han.nl" },
 ]
 classifiers = [
   "Environment :: Console",
   "Framework :: FastAPI",
   "Programming Language :: Python :: 3.12",
 ]
-
-description = "Knowledge Platform Management App library"
-dynamic = ["version"]
-license = {text = "NONE"}
-name = "knowledgeplatformmanagement-generic"
-readme = "README.md"
 requires-python = ">=3.12"
+dynamic = ["version"]
 
+dependencies = [
+  "sentence-transformers",
+  "torch",
+  "docling",
+  "typedb-driver==2.29.2",
+  "span-marker",
+  "langfuse",
+  "asapi",
+]
+
+# -----------------------------
+# Testing
+# -----------------------------
 [tool.pytest.ini_options]
 pythonpath = ["src", "src/knowledgeplatformmanagement_han", "src/knowledgeplatformmanagement_generic"]
 addopts = ["--import-mode=importlib"]
 testpaths = ["tests"]
-# keep your existing pythonpath:
-# pythonpath = ["src", "src/knowledgeplatformmanagement_han", "src/knowledgeplatformmanagement_generic"]
 
+# -----------------------------
+# Mypy
+# -----------------------------
 [tool.mypy]
 allow_redefinition = true
-# Turn off specific error codes globally
 disable_error_code = [
     "call-arg",        # unexpected keyword arguments
     "import-untyped",  # missing stubs like requests
@@ -46,10 +82,89 @@ exclude = [
     "^\\.pixi/",  # ignore the .pixi folder at repo root
 ]
 
-
-
+# -----------------------------
+# Ruff
+# -----------------------------
 [tool.ruff.lint]
 select = ["E4", "E7", "E9", "F", "C4", "PT"]
 
 [tool.ruff]
 exclude = [".pixi", "tests"]
+
+# -----------------------------
+# Pixi (Conda) — merged here for clarity
+# -----------------------------
+[tool.pixi.workspace]
+channels = [
+  "https://fast.prefix.dev/conda-forge",
+  "https://repo.prefix.dev/pypdfium2-public",
+  "https://repo.prefix.dev/pytorch",
+]
+platforms = ["linux-64", "osx-64", "osx-arm64", "win-64"]
+
+# Host deps (for builds like docling from PyPI)
+[tool.pixi.host-dependencies]
+compilers = "*"
+pkg-config = "*"
+
+# Conda-side runtime dependencies
+[tool.pixi.dependencies]
+python = "3.12.*"
+# Dotenv is for reading .env files
+python-dotenv = "*"
+# Linkify-it is for str -> url conversion
+linkify-it-py = "*"
+# Path validation
+pathvalidate = "*"
+# Low level css-parser
+tinycss2 = "*"
+# Async network lib
+anyio = "*"
+# Web framework
+fastapi = "*"
+# WIP: Will be replaced with langfuse
+openai = "*"
+# Used for generating vector db
+qdrant-client = "*"
+# Data manipulation
+pyarrow = "*"
+scikit-learn = "*"
+# Linguistic data manipulation
+spacy = "*"
+lingua-language-detector = "*"
+unidecode = "*"
+# Used for m365 stuff
+azure-identity = "*"
+microsoft-kiota-authentication-azure = "*"
+msgraph-sdk = "*"
+
+# Activation env
+[tool.pixi.activation.env]
+PYTHONNOUSERSITE = "1"
+LD_LIBRARY_PATH = "$CONDA_PREFIX/lib:$LD_LIBRARY_PATH"
+
+# Platform-specific deps
+[tool.pixi.target.linux-64.dependencies]
+python-devtools = "*"         # Optional but useful
+# cuda-toolkit = "12.9.0.*"   # For use with CUDA
+
+# Tasks (invoke with `pixi run <task>`)
+[tool.pixi.tasks]
+lint = "ruff check"
+typecheck = "mypy ."
+test = "pytest -q"
+
+# Platform-specific tasks
+[tool.pixi.target.linux-64.tasks]
+vscode = 'env -u LD_LIBRARY_PATH code .'
+
+[tool.pixi.target.osx.tasks]
+vscode = 'env -u LD_LIBRARY_PATH code .'
+
+[tool.pixi.target.osx-arm64.tasks]
+vscode = 'env -u LD_LIBRARY_PATH code .'
+
+# Environments mapping (so you can do `pixi shell -e development`)
+[tool.pixi.environments]
+development = { features = ["dev"], solve-group = "test" }
+default = { features = [] }
