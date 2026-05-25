@@ -6,7 +6,9 @@ from typing import Any, Callable
 
 from loguru import logger
 
-from database_builder_libs.relational._abstract import AbstractRelationalStore
+from database_builder_libs.models.abstract_relational_store import (
+    AbstractRelationalStore,
+)
 
 
 def _retry(max_attempts: int = 3, base_delay: float = 0.1) -> Callable:

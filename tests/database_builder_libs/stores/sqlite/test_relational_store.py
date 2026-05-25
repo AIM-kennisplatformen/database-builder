@@ -1,9 +1,7 @@
 import pytest
 
-from database_builder_libs.relational import (
-    AbstractRelationalStore,
-    SqliteRelationalStore,
-)
+from database_builder_libs.models.abstract_relational_store import AbstractRelationalStore
+from database_builder_libs.stores.sqlite._relational import SqliteRelationalStore
 
 
 class _TestStore(SqliteRelationalStore):
