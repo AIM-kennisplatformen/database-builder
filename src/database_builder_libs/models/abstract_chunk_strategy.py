@@ -66,5 +66,3 @@ class AbstractChunkingStrategy(ABC):
             or all sections are blank after cleaning.
         """
         raise NotImplementedError
-
-

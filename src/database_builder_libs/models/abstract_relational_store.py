@@ -4,61 +4,146 @@ from typing import Any
 
 class AbstractRelationalStore(ABC):
     """
-    Abstract interface for a relational data store.
+    Abstract domain-level interface for a relational data store.
 
-    Provides primitive operations for executing queries, committing
-    transactions, and managing the lifecycle. Implementations may
-    use SQLite, PostgreSQL, or any other relational backend.
+    Provides CRUD operations (``insert``, ``query``, ``update``,
+    ``delete``) with dictionary-based row representations, plus
+    ``query_raw`` / ``execute`` escape hatches for complex SQL.
+
+    Implementations can use SQLite, PostgreSQL, or any other
+    relational backend.
     """
 
     @abstractmethod
-    def execute(self, sql: str, params: tuple | list | None = None) -> Any:
+    def insert(self, table: str, row: dict[str, Any]) -> None:
         """
-        Execute a single SQL statement and return the cursor.
+        Insert a single row into a table.
 
         Parameters
         ----------
-        sql : str
-            SQL statement, optionally with ``?`` placeholders.
-        params : tuple | list | None
-            Bound parameters for the placeholders.
-
-        Returns
-        -------
-        Any
-            A cursor-like object that supports ``fetchone()``,
-            ``fetchall()``, and ``rowcount``.
+        table : str
+            Target table name.
+        row : dict[str, Any]
+            Column-value mapping for the new row.
         """
         ...
 
     @abstractmethod
-    def executemany(self, sql: str, rows: list[tuple]) -> None:
+    def query(
+        self,
+        table: str,
+        filter: dict[str, Any] | None = None,
+    ) -> list[dict[str, Any]]:
         """
-        Execute the same SQL statement for every row in ``rows``.
+        Query rows from a table with equality-based filters.
+
+        Parameters
+        ----------
+        table : str
+            Target table name.
+        filter : dict[str, Any] | None
+            Column-value pairs for WHERE equality clauses.
+            ``None`` or empty dict returns all rows.
+
+        Returns
+        -------
+        list[dict[str, Any]]
+            Matching rows as column-value mappings.
+        """
+        ...
+
+    @abstractmethod
+    def update(
+        self,
+        table: str,
+        filter: dict[str, Any],
+        values: dict[str, Any],
+    ) -> int:
+        """
+        Update rows matching an equality-based filter.
+
+        Parameters
+        ----------
+        table : str
+            Target table name.
+        filter : dict[str, Any]
+            Column-value pairs for WHERE equality clauses.
+        values : dict[str, Any]
+            Column-value pairs to set.
+
+        Returns
+        -------
+        int
+            Number of rows updated.
+        """
+        ...
+
+    @abstractmethod
+    def delete(
+        self,
+        table: str,
+        filter: dict[str, Any],
+    ) -> int:
+        """
+        Delete rows matching an equality-based filter.
+
+        Parameters
+        ----------
+        table : str
+            Target table name.
+        filter : dict[str, Any]
+            Column-value pairs for WHERE equality clauses.
+
+        Returns
+        -------
+        int
+            Number of rows deleted.
+        """
+        ...
+
+    @abstractmethod
+    def query_raw(
+        self,
+        sql: str,
+        params: tuple | list | None = None,
+    ) -> list[dict[str, Any]]:
+        """
+        Execute a raw SELECT query and return rows as dicts.
 
         Parameters
         ----------
         sql : str
             SQL statement with ``?`` placeholders.
-        rows : list[tuple]
-            Each tuple provides the parameter values for one execution.
+        params : tuple | list | None
+            Bound parameters for the placeholders.
+
+        Returns
+        -------
+        list[dict[str, Any]]
+            Result rows as column-value mappings.
         """
-        ...
 
     @abstractmethod
-    def commit(self) -> None:
-        """Commit the current transaction."""
-
-    @abstractmethod
-    def cursor(self) -> Any:
+    def execute(
+        self,
+        sql: str,
+        params: tuple | list | None = None,
+    ) -> int:
         """
-        Return a new cursor object.
+        Execute a raw DML statement (INSERT, UPDATE, DELETE, DDL).
 
-        Consumers should prefer ``execute()`` over ``cursor()``
-        whenever possible, because ``execute()`` may include
-        additional guarantees such as automatic retries.
+        Parameters
+        ----------
+        sql : str
+            SQL statement with ``?`` placeholders.
+        params : tuple | list | None
+            Bound parameters for the placeholders.
+
+        Returns
+        -------
+        int
+            Number of rows affected (for DML). May be 0 for DDL.
         """
-        ...
 
     @abstractmethod
     def close(self) -> None:

@@ -10,6 +10,7 @@ from database_builder_libs.stores.typedb._read import TypeDbReadMixin
 from database_builder_libs.stores.typedb._write import TypeDbWriteMixin
 from database_builder_libs.stores.typedb._delete import TypeDbDeleteMixin
 
+
 class TypeDbDatastore(
     TypeDbDeleteMixin,
     TypeDbWriteMixin,
@@ -71,7 +72,9 @@ class TypeDbDatastore(
     -----
     This adapter assumes the schema defines a key attribute for each entity type.
     """
+
     pass
+
 
 __all__ = [
     "TypeDbDatastore",

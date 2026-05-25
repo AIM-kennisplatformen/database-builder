@@ -47,10 +47,14 @@ class TypeDbBase(AbstractStore):
         if not uri or not database:
             raise ValueError("TypeDB config requires 'uri' and 'database'")
 
-        credentials = Credentials(str(config.get("username", "")), str(config.get("password", "")))
+        credentials = Credentials(
+            str(config.get("username", "")), str(config.get("password", ""))
+        )
         driver_options = DriverOptions(is_tls_enabled=bool(config.get("tls", False)))
 
-        self.typedb_driver = TypeDB.driver(address=uri, credentials=credentials, driver_options=driver_options)
+        self.typedb_driver = TypeDB.driver(
+            address=uri, credentials=credentials, driver_options=driver_options
+        )
         self.database = database
 
         # create database if missing
@@ -66,13 +70,17 @@ class TypeDbBase(AbstractStore):
 
             # required by TypeDB after schema change
             self.typedb_driver.close()
-            self.typedb_driver = TypeDB.driver(address=uri, credentials=credentials, driver_options=driver_options)
+            self.typedb_driver = TypeDB.driver(
+                address=uri, credentials=credentials, driver_options=driver_options
+            )
 
         for type_name, key_attr in self._load_key_attrs_from_schema().items():
             self._key_attr_cache[type_name] = key_attr
 
     @contextmanager
-    def transaction(self, transaction_type: TransactionType) -> Generator[Transaction, None, None]:
+    def transaction(
+        self, transaction_type: TransactionType
+    ) -> Generator[Transaction, None, None]:
         """
         Context manager for yielding a TypeDB transaction.
         Handles commits automatically for write and schema transactions.
@@ -81,7 +89,9 @@ class TypeDbBase(AbstractStore):
         assert self.typedb_driver is not None
         assert self.database is not None
 
-        with self.typedb_driver.transaction(database_name=self.database, transaction_type=transaction_type) as transaction:
+        with self.typedb_driver.transaction(
+            database_name=self.database, transaction_type=transaction_type
+        ) as transaction:
             try:
                 yield transaction
             except Exception:
@@ -89,7 +99,9 @@ class TypeDbBase(AbstractStore):
                 # Do NOT commit — let TypeDB abort on close
                 raise
             else:
-                if (transaction_type.is_write() or transaction_type.is_schema()) and transaction.is_open():
+                if (
+                    transaction_type.is_write() or transaction_type.is_schema()
+                ) and transaction.is_open():
                     transaction.commit()
 
     def query_read(self, query: str) -> EagerQueryAnswer:
@@ -116,4 +128,6 @@ class TypeDbBase(AbstractStore):
 
     def _load_key_attrs_from_schema(self) -> dict[str, str]:
         """Load key attributes mapped by entity type from the database schema."""
-        raise NotImplementedError("This method should be implemented by TypeDbSchemaMixin")
+        raise NotImplementedError(
+            "This method should be implemented by TypeDbSchemaMixin"
+        )

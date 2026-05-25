@@ -19,18 +19,18 @@ class TypeDbSchemaMixin(TypeDbBase):
 
         for line in schema_text.splitlines():
             line = line.strip()
-            type_match = re.match(r'^(?:entity|relation)\s+([\w\-]+)', line)
+            type_match = re.match(r"^(?:entity|relation)\s+([\w\-]+)", line)
             if type_match:
                 current_type = type_match.group(1)
 
-            sub_match = re.search(r'sub\s+([\w\-]+)', line)
+            sub_match = re.search(r"sub\s+([\w\-]+)", line)
             if sub_match and current_type:
                 parent = sub_match.group(1)
                 if parent not in ("entity", "relation", "attribute"):
                     parent_map[current_type] = parent
 
             if current_type:
-                key_match = re.search(r'owns\s+([\w\-]+)\s+@key', line)
+                key_match = re.search(r"owns\s+([\w\-]+)\s+@key", line)
                 if key_match:
                     key_map[current_type] = key_match.group(1)
 
@@ -54,7 +54,9 @@ class TypeDbSchemaMixin(TypeDbBase):
 
         return key_map
 
-    def _get_key_attribute(self, entity_type: str, payload: Mapping[str, object]) -> str:
+    def _get_key_attribute(
+        self, entity_type: str, payload: Mapping[str, object]
+    ) -> str:
         """Get the key attribute name for an entity type, falling back to an inferred one."""
         key = self._key_attr_cache.get(entity_type)
         return key if key else sorted(payload.keys())[0]
@@ -95,5 +97,5 @@ class TypeDbSchemaMixin(TypeDbBase):
         """
 
         rows = self.query_read(query).as_concept_documents()
-        self._all_attr_cache = sorted({r.get("a").get('label') for r in list(rows)})
+        self._all_attr_cache = sorted({r.get("a").get("label") for r in list(rows)})
         return self._all_attr_cache

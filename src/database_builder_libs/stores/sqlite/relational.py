@@ -89,11 +89,7 @@ class SqliteRelationalStore(AbstractRelationalStore):
 
     def _create_schema_version_table(self) -> None:
         self.conn.execute(
-            """
-            CREATE TABLE IF NOT EXISTS _schema_version(
-                version INTEGER PRIMARY KEY
-            )
-            """
+            "CREATE TABLE IF NOT EXISTS _schema_version(version INTEGER PRIMARY KEY)"
         )
 
     def _get_schema_version(self) -> int:
@@ -102,28 +98,83 @@ class SqliteRelationalStore(AbstractRelationalStore):
         return row[0] if row and row[0] is not None else 0
 
     def _set_schema_version(self, version: int) -> None:
-        self.conn.execute(
-            "INSERT INTO _schema_version(version) VALUES (?)", (version,)
-        )
+        self.conn.execute("INSERT INTO _schema_version(version) VALUES (?)", (version,))
 
     def _run_migrations(self, from_version: int) -> None:
         """Override in subclasses to define schema migrations."""
 
     @_retry()
-    def execute(self, sql: str, params: tuple | list | None = None) -> Any:
-        return self.conn.execute(sql, params or ())
+    def insert(self, table: str, row: dict[str, Any]) -> None:
+        columns = ", ".join(row)
+        placeholders = ", ".join("?" for _ in row)
+        self.conn.execute(
+            f"INSERT INTO {table} ({columns}) VALUES ({placeholders})",
+            tuple(row.values()),
+        )
 
     @_retry()
-    def executemany(self, sql: str, rows: list[tuple]) -> None:
-        self.conn.executemany(sql, rows)
+    def query(
+        self,
+        table: str,
+        filter: dict[str, Any] | None = None,
+    ) -> list[dict[str, Any]]:
+        if filter:
+            where = " AND ".join(f"{k}=?" for k in filter)
+            cur = self.conn.execute(
+                f"SELECT * FROM {table} WHERE {where}",
+                tuple(filter.values()),
+            )
+        else:
+            cur = self.conn.execute(f"SELECT * FROM {table}")
+        return self._rows_to_dicts(cur)
+
+    @_retry()
+    def update(
+        self,
+        table: str,
+        filter: dict[str, Any],
+        values: dict[str, Any],
+    ) -> int:
+        set_clause = ", ".join(f"{k}=?" for k in values)
+        where = " AND ".join(f"{k}=?" for k in filter)
+        cur = self.conn.execute(
+            f"UPDATE {table} SET {set_clause} WHERE {where}",
+            tuple(values.values()) + tuple(filter.values()),
+        )
+        return cur.rowcount
+
+    @_retry()
+    def delete(self, table: str, filter: dict[str, Any]) -> int:
+        where = " AND ".join(f"{k}=?" for k in filter)
+        cur = self.conn.execute(
+            f"DELETE FROM {table} WHERE {where}",
+            tuple(filter.values()),
+        )
+        return cur.rowcount
+
+    @_retry()
+    def query_raw(
+        self,
+        sql: str,
+        params: tuple | list | None = None,
+    ) -> list[dict[str, Any]]:
+        cur = self.conn.execute(sql, params or ())
+        return self._rows_to_dicts(cur)
+
+    @_retry()
+    def execute(self, sql: str, params: tuple | list | None = None) -> int:
+        cur = self.conn.execute(sql, params or ())
+        return cur.rowcount
 
     @_retry()
     def commit(self) -> None:
         self.conn.commit()
 
-    def cursor(self) -> Any:
-        return self.conn.cursor()
-
     def close(self) -> None:
         self.conn.close()
         logger.debug("Database connection closed")
+
+    @staticmethod
+    def _rows_to_dicts(cur: sqlite3.Cursor) -> list[dict[str, Any]]:
+        columns = [desc[0] for desc in cur.description]
+        return [dict(zip(columns, row)) for row in cur.fetchall()]

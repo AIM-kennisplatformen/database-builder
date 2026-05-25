@@ -18,16 +18,21 @@ class _FileTypeInfo:
 
 
 FILE_TYPES: dict[str, _FileTypeInfo] = {
-    "pdf":  _FileTypeInfo("application/pdf",                                                          ".pdf"),
-    "epub": _FileTypeInfo("application/epub+zip",                                                     ".epub"),
-    "docx": _FileTypeInfo("application/vnd.openxmlformats-officedocument.wordprocessingml.document",  ".docx"),
-    "doc":  _FileTypeInfo("application/msword",                                                       ".doc"),
-    "txt":  _FileTypeInfo("text/plain",                                                               ".txt"),
-    "html": _FileTypeInfo("text/html",                                                                ".html"),
+    "pdf": _FileTypeInfo("application/pdf", ".pdf"),
+    "epub": _FileTypeInfo("application/epub+zip", ".epub"),
+    "docx": _FileTypeInfo(
+        "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+        ".docx",
+    ),
+    "doc": _FileTypeInfo("application/msword", ".doc"),
+    "txt": _FileTypeInfo("text/plain", ".txt"),
+    "html": _FileTypeInfo("text/html", ".html"),
 }
 
 # Reverse lookup: MIME type → extension, derived from FILE_TYPES
-MIME_TO_EXT: dict[str, str] = {info.mime: info.extension for info in FILE_TYPES.values()}
+MIME_TO_EXT: dict[str, str] = {
+    info.mime: info.extension for info in FILE_TYPES.values()
+}
 
 # Default priority order when no accept_types are specified.
 # Derived from FILE_TYPES insertion order — update FILE_TYPES to change this.
@@ -128,12 +133,17 @@ class ZoteroSource(AbstractSource[ZoteroConfig]):
             if type_info is None:
                 logger.warning("Unknown file type '{}', skipping", file_type)
                 continue
-            if match := next((a for a in attachments if content_type(a) == type_info.mime), None):
+            if match := next(
+                (a for a in attachments if content_type(a) == type_info.mime), None
+            ):
                 logger.debug("Selected {} attachment for item", file_type)
                 return match
 
         if allow_fallback:
-            logger.debug("No preferred type found (wanted: {}), using first attachment", accept_types)
+            logger.debug(
+                "No preferred type found (wanted: {}), using first attachment",
+                accept_types,
+            )
             return attachments[0]
 
         logger.warning("No acceptable attachment found (wanted: {})", accept_types)
@@ -255,7 +265,9 @@ class ZoteroSource(AbstractSource[ZoteroConfig]):
 
         attachment = self._select_best_attachment(
             attachments,
-            accept_types=accept_types if accept_types is not None else DEFAULT_ACCEPT_TYPES,
+            accept_types=accept_types
+            if accept_types is not None
+            else DEFAULT_ACCEPT_TYPES,
             allow_fallback=allow_fallback,
         )
 
@@ -318,7 +330,8 @@ class ZoteroSource(AbstractSource[ZoteroConfig]):
 
         items_iter = (
             z.collection_items_top(config.collection, limit=None)
-            if config.collection else z.items()
+            if config.collection
+            else z.items()
         )
         items = list(z.everything(items_iter))
 

@@ -7,7 +7,9 @@ if TYPE_CHECKING:
 
 
 class TypeDbDeleteMixin(TypeDbBase):
-    def remove_nodes(self: "TypeDbDatastore", filter: str, allow_multiple: bool = False) -> int:
+    def remove_nodes(
+        self: "TypeDbDatastore", filter: str, allow_multiple: bool = False
+    ) -> int:
         """
         Delete nodes matching the filter.
 

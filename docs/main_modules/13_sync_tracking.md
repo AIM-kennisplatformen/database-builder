@@ -4,6 +4,8 @@ The sync tracking module lives in `database_builder_libs.utility.sync`.
 
 It provides an abstract interface (`AbstractSyncTracker`) and a SQLite-backed implementation (`SqliteSyncTracker`) for tracking per-source synchronization state and detecting artifact modification conflicts.
 
+`SqliteSyncTracker` inherits from `SqliteRelationalStore` (`database_builder_libs.stores.sqlite.relational`), which implements `AbstractRelationalStore` (`database_builder_libs.models.abstract_relational_store`) — a generic CRUD wrapper around SQLite with retry, WAL mode, and schema migration support.
+
 ## Pattern
 
 The typical sync workflow has three steps:
@@ -87,7 +89,34 @@ A conflict occurs when two sources report the same artifact (`item_key`) with di
 
 The `finish_sync` method automatically checks for conflicts and returns the problematic item keys. After reconciliation (updating the conflicting source), the conflict is resolved.
 
-### Error handling
+### SqliteRelationalStore layer
+
+`SqliteRelationalStore` provides the low-level CRUD interface inherited by `SqliteSyncTracker`. Use it directly when you need a simple SQLite-backed store without sync logic:
+
+```python
+from database_builder_libs.stores.sqlite.relational import SqliteRelationalStore
+
+store = SqliteRelationalStore("my.db")
+store.insert("users", {"id": 1, "name": "Alice"})
+rows = store.query("users", {"name": "Alice"})
+store.update("users", {"id": 1}, {"name": "Bob"})
+store.delete("users", {"id": 1})
+store.close()
+```
+
+| Method | Returns | Description |
+|---|---|---|
+| `insert(table, row)` | `None` | Insert a single row (dict) |
+| `query(table, filter)` | `list[dict]` | Query with equality filter; `None`/`{}` returns all |
+| `update(table, filter, values)` | `int` | Update matching rows, returns count |
+| `delete(table, filter)` | `int` | Delete matching rows, returns count |
+| `query_raw(sql, params)` | `list[dict]` | Raw SELECT with `?` placeholders |
+| `execute(sql, params)` | `int` | Raw DML/DDL, returns affected rows |
+| `commit()` | `None` | Explicit commit |
+
+Implement `AbstractRelationalStore` to back the same CRUD API with other databases (PostgreSQL, DuckDB, etc.).
+
+## Error handling
 
 Database operations are wrapped with automatic retry (3 attempts with exponential backoff) for `sqlite3.OperationalError` (e.g., database lock). All operations are logged via `loguru`.
 
@@ -101,23 +130,27 @@ tracker = SqliteSyncTracker(db_path=":memory:")
 
 ## Custom database backends
 
-Implement `AbstractSyncTracker` to support other backends:
+There are two levels you can implement:
 
-```python
-from database_builder_libs.utility.sync import AbstractSyncTracker, Artifact, ConflictItem
+1. **Implement `AbstractRelationalStore`** for a new database backend, then reuse `SqliteSyncTracker`'s logic (it calls only CRUD methods + `query_raw`/`execute`):
+   ```python
+   from database_builder_libs.models.abstract_relational_store import AbstractRelationalStore
 
-class PostgresSyncTracker(AbstractSyncTracker):
-    def start_sync(self, source_name: str) -> float | None:
-        ...
+   class PostgresRelationalStore(AbstractRelationalStore):
+       def insert(self, table, row): ...
+       def query(self, table, filter): ...
+       # ...
+   ```
 
-    def finish_sync(
-        self, source_name: str, artifacts: list[Artifact]
-    ) -> list[ConflictItem]:
-        ...
+2. **Implement `AbstractSyncTracker` directly** for a completely different storage model:
+   ```python
+   from database_builder_libs.utility.sync import AbstractSyncTracker, Artifact, ConflictItem
 
-    def close(self) -> None:
-        ...
-```
+   class CustomSyncTracker(AbstractSyncTracker):
+       def start_sync(self, source_name: str) -> float | None: ...
+       def finish_sync(self, source_name: str, artifacts: list[Artifact]) -> list[ConflictItem]: ...
+       def close(self) -> None: ...
+   ```
 
 ## Troubleshooting
 

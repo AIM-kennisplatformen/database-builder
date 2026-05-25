@@ -5,7 +5,7 @@ from typedb.driver import QueryAnswer
 class RelationRef(TypedDict):
     """
     Reference to a specific entity playing a role in a relation.
-    
+
     Attributes
     ----------
     entity_type : str
@@ -15,6 +15,7 @@ class RelationRef(TypedDict):
     key : str
         The string value of the key attribute.
     """
+
     entity_type: str
     key_attr: str
     key: str
@@ -23,7 +24,7 @@ class RelationRef(TypedDict):
 class RelationData(TypedDict, total=False):
     """
     Representation of a TypeDB relation.
-    
+
     Attributes
     ----------
     type : str
@@ -33,6 +34,7 @@ class RelationData(TypedDict, total=False):
     attributes : Mapping[str, object]
         Optional mapping of attribute names to their values for this relation.
     """
+
     type: str
     roles: dict[str, RelationRef]
     attributes: Mapping[str, object]
@@ -43,6 +45,7 @@ class EagerQueryAnswer:
     Eagerly evaluates a TypeDB QueryAnswer to prevent 'concurrent transaction close' errors
     when evaluating iterator wrappers outside of the transaction block.
     """
+
     is_concept_documents: bool
     is_concept_rows: bool
     _concept_documents: list
