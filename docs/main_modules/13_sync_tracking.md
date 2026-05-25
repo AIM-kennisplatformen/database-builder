@@ -4,7 +4,7 @@ The sync tracking module lives in `database_builder_libs.utility.sync`.
 
 It provides an abstract interface (`AbstractSyncTracker`) and a SQLite-backed implementation (`SqliteSyncTracker`) for tracking per-source synchronization state and detecting artifact modification conflicts.
 
-`SqliteSyncTracker` inherits from `SqliteRelationalStore` (`database_builder_libs.stores.sqlite.relational`), which implements `AbstractRelationalStore` (`database_builder_libs.models.abstract_relational_store`) — a generic CRUD wrapper around SQLite with retry, WAL mode, and schema migration support.
+`SqliteSyncTracker` inherits from `SqliteRelationalStore` (`database_builder_libs.stores.sqlite.sqlite_store`), which implements `AbstractRelationalStore` (`database_builder_libs.models.abstract_relational_store`) — a generic CRUD wrapper around SQLite with retry, WAL mode, and schema migration support.
 
 ## Pattern
 
@@ -94,7 +94,7 @@ The `finish_sync` method automatically checks for conflicts and returns the prob
 `SqliteRelationalStore` provides the low-level CRUD interface inherited by `SqliteSyncTracker`. Use it directly when you need a simple SQLite-backed store without sync logic:
 
 ```python
-from database_builder_libs.stores.sqlite.relational import SqliteRelationalStore
+from database_builder_libs.stores.sqlite.sqlite_store import SqliteRelationalStore
 
 store = SqliteRelationalStore("my.db")
 store.insert("users", {"id": 1, "name": "Alice"})

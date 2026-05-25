@@ -4,7 +4,7 @@ from typing import Any, Optional
 
 from loguru import logger
 
-from database_builder_libs.stores.sqlite.relational import SqliteRelationalStore
+from database_builder_libs.stores.sqlite.sqlite_store import SqliteRelationalStore
 from database_builder_libs.utility.sync._base import (
     AbstractSyncTracker,
     Artifact,
