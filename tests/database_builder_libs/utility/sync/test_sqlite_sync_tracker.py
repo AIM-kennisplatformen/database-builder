@@ -161,6 +161,30 @@ class TestCustomTableNames:
         assert conflicts == []
 
 
+class TestInjectionSafety:
+    def test_table_sources_injection_raises(self):
+        with pytest.raises(ValueError):
+            SqliteSyncTracker(db_path=":memory:", table_sources="sources; DROP TABLE")
+
+    def test_table_artifacts_injection_raises(self):
+        with pytest.raises(ValueError):
+            SqliteSyncTracker(db_path=":memory:", table_artifacts="artifacts; DROP TABLE")
+
+    def test_injection_with_spaces_raises(self):
+        with pytest.raises(ValueError):
+            SqliteSyncTracker(db_path=":memory:", table_sources="my sources")
+
+    def test_injection_with_digits_start_raises(self):
+        with pytest.raises(ValueError):
+            SqliteSyncTracker(db_path=":memory:", table_sources="1table")
+
+    def test_legitimate_table_names_pass(self, fresh_tracker):
+        t = fresh_tracker(table_sources="custom_src", table_artifacts="custom_artf")
+        t.start_sync("Zotero")
+        conflicts = t.finish_sync("Zotero", [("item-1", datetime.fromtimestamp(100))])
+        assert conflicts == []
+
+
 class TestCleanupOldRecords:
     def test_removes_old_artifacts(self, tracker):
         tracker.start_sync("Zotero")

@@ -155,3 +155,41 @@ class TestQueryRaw:
         store.insert("test_items", {"id": 1, "label": "a"})
         rows = store.query_raw("SELECT COUNT(*) AS cnt FROM test_items")
         assert rows[0]["cnt"] == 1
+
+
+class TestInjectionSafety:
+    def test_insert_table_injection_raises(self, store):
+        with pytest.raises(ValueError):
+            store.insert("test_items; DROP TABLE test_items", {"id": 1})
+
+    def test_insert_column_injection_raises(self, store):
+        with pytest.raises(ValueError):
+            store.insert("test_items", {"id; DROP TABLE test_items": 1})
+
+    def test_query_table_injection_raises(self, store):
+        with pytest.raises(ValueError):
+            store.query("test_items; DROP TABLE test_items")
+
+    def test_query_filter_column_injection_raises(self, store):
+        with pytest.raises(ValueError):
+            store.query("test_items", {"id; DROP": 1})
+
+    def test_update_table_injection_raises(self, store):
+        with pytest.raises(ValueError):
+            store.update("test_items; DROP", {"id": 1}, {"label": "x"})
+
+    def test_update_set_column_injection_raises(self, store):
+        with pytest.raises(ValueError):
+            store.update("test_items", {"id": 1}, {"label; DROP": "x"})
+
+    def test_update_filter_column_injection_raises(self, store):
+        with pytest.raises(ValueError):
+            store.update("test_items", {"id; DROP": 1}, {"label": "x"})
+
+    def test_delete_table_injection_raises(self, store):
+        with pytest.raises(ValueError):
+            store.delete("test_items; DROP TABLE test_items", {"id": 1})
+
+    def test_delete_filter_column_injection_raises(self, store):
+        with pytest.raises(ValueError):
+            store.delete("test_items", {"id; DROP": 1})

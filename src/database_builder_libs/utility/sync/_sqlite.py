@@ -27,6 +27,8 @@ class SqliteSyncTracker(SqliteRelationalStore, AbstractSyncTracker):
     ) -> None:
         self._table_sources = table_sources
         self._table_artifacts = table_artifacts
+        self._validate_identifier(self._table_sources, "table name")
+        self._validate_identifier(self._table_artifacts, "table name")
         resolved = str(db_path) if db_path is not None else DEFAULT_DB_PATH
         SqliteRelationalStore.__init__(self, db_path=resolved, timeout=timeout)
 
