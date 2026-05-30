@@ -14,15 +14,17 @@ class _TestStore(SqliteRelationalStore):
 
 @pytest.fixture
 def store():
-    s = _TestStore(db_path=":memory:")
-    yield s
-    s.close()
+    store = _TestStore(db_path=":memory:")
+    store.connect()
+    yield store
+    store.close()
 
 
 class TestConnection:
     def test_in_memory(self):
-        s = SqliteRelationalStore(db_path=":memory:")
-        s.close()
+        store = SqliteRelationalStore(db_path=":memory:")
+        store.connect()
+        store.close()
 
     def test_schema_version_table_created(self, store):
         rows = store.query_raw("SELECT name FROM sqlite_master WHERE type='table' AND name='_schema_version'")
@@ -59,7 +61,7 @@ class TestClose:
 
     def test_raises_after_close(self, store):
         store.close()
-        with pytest.raises(Exception):
+        with pytest.raises(RuntimeError, match="before connect"):
             store.execute("SELECT 1")
 
 
@@ -69,12 +71,13 @@ class TestSchemaMigration:
         assert rows[0]["v"] == 1
 
     def test_subclass_custom_schema(self):
-        s = _TestStore(db_path=":memory:")
+        store = _TestStore(db_path=":memory:")
+        store.connect()
         try:
-            rows = s.query_raw("SELECT name FROM sqlite_master WHERE type='table' AND name='test_items'")
+            rows = store.query_raw("SELECT name FROM sqlite_master WHERE type='table' AND name='test_items'")
             assert len(rows) == 1
         finally:
-            s.close()
+            store.close()
 
 
 class TestAbstractInterface:

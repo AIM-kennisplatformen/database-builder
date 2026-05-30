@@ -1,6 +1,5 @@
 from abc import ABC, abstractmethod
 from datetime import datetime
-from typing import Optional
 
 Artifact = tuple[str, datetime]
 ConflictItem = str
@@ -31,7 +30,7 @@ class AbstractSyncTracker(ABC):
     """
 
     @abstractmethod
-    def start_sync(self, source_name: str) -> Optional[float]:
+    def start_sync(self, source_name: str) -> float | None:
         """
         Return the last successful sync timestamp for a source.
 

@@ -1,17 +1,17 @@
-import sqlite3
 import time
 from datetime import datetime
 
 import pytest
 
-from database_builder_libs.utility.sync import SqliteSyncTracker
+from database_builder_libs.utility.sync._sqlite import SqliteSyncTracker
 
 
 @pytest.fixture
 def tracker():
-    t = SqliteSyncTracker(db_path=":memory:")
-    yield t
-    t.close()
+    tracker = SqliteSyncTracker(db_path=":memory:")
+    tracker.connect()
+    yield tracker
+    tracker.close()
 
 
 @pytest.fixture
@@ -20,13 +20,14 @@ def fresh_tracker():
     instances = []
 
     def _make(**kwargs):
-        t = SqliteSyncTracker(db_path=":memory:", **kwargs)
-        instances.append(t)
-        return t
+        tracker = SqliteSyncTracker(db_path=":memory:", **kwargs)
+        tracker.connect()
+        instances.append(tracker)
+        return tracker
 
     yield _make
-    for inst in instances:
-        inst.close()
+    for instance in instances:
+        instance.close()
 
 
 class TestStartSync:
@@ -145,19 +146,20 @@ class TestConflictDetection:
 
 class TestInMemoryDatabase:
     def test_in_memory_works(self):
-        t = SqliteSyncTracker(db_path=":memory:")
+        tracker = SqliteSyncTracker(db_path=":memory:")
+        tracker.connect()
         try:
-            last_sync = t.start_sync("Zotero")
+            last_sync = tracker.start_sync("Zotero")
             assert last_sync is None
         finally:
-            t.close()
+            tracker.close()
 
 
 class TestCustomTableNames:
     def test_custom_table_names(self, fresh_tracker):
-        t = fresh_tracker(table_sources="src", table_artifacts="artf")
-        t.start_sync("Zotero")
-        conflicts = t.finish_sync("Zotero", [("item-1", datetime.fromtimestamp(100))])
+        tracker = fresh_tracker(table_sources="src", table_artifacts="artf")
+        tracker.start_sync("Zotero")
+        conflicts = tracker.finish_sync("Zotero", [("item-1", datetime.fromtimestamp(100))])
         assert conflicts == []
 
 
@@ -215,7 +217,7 @@ class TestSyncHistory:
         )
         history = tracker.sync_history("Zotero")
         assert len(history) == 2
-        keys = {h["item_key"] for h in history}
+        keys = {entry["item_key"] for entry in history}
         assert keys == {"item-1", "item-2"}
 
     def test_empty_history_for_unknown_source(self, tracker):
@@ -254,19 +256,21 @@ class TestClose:
 
     def test_closed_tracker_raises(self, tracker):
         tracker.close()
-        with pytest.raises(sqlite3.ProgrammingError):
+        with pytest.raises(RuntimeError, match="before connect"):
             tracker.start_sync("Zotero")
 
     def test_multiple_trackers_same_file(self, tmp_path):
         db_path = tmp_path / "shared.db"
-        t1 = SqliteSyncTracker(db_path=db_path)
-        t2 = SqliteSyncTracker(db_path=db_path)
+        tracker_1 = SqliteSyncTracker(db_path=db_path)
+        tracker_2 = SqliteSyncTracker(db_path=db_path)
+        tracker_1.connect()
+        tracker_2.connect()
         try:
-            t1.start_sync("SourceA")
-            t2.start_sync("SourceB")
-            t1.finish_sync("SourceA", [("item-1", datetime.fromtimestamp(100))])
-            t2.finish_sync("SourceB", [("item-1", datetime.fromtimestamp(200))])
-            assert t1.start_sync("SourceA") is not None
+            tracker_1.start_sync("SourceA")
+            tracker_2.start_sync("SourceB")
+            tracker_1.finish_sync("SourceA", [("item-1", datetime.fromtimestamp(100))])
+            tracker_2.finish_sync("SourceB", [("item-1", datetime.fromtimestamp(200))])
+            assert tracker_1.start_sync("SourceA") is not None
         finally:
-            t1.close()
-            t2.close()
+            tracker_1.close()
+            tracker_2.close()

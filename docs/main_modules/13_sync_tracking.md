@@ -1,8 +1,6 @@
 # Sync tracking
 
-The sync tracking module lives in `database_builder_libs.utility.sync`.
-
-It provides an abstract interface (`AbstractSyncTracker`) and a SQLite-backed implementation (`SqliteSyncTracker`) for tracking per-source synchronization state and detecting artifact modification conflicts.
+The sync tracking module provides an abstract interface (`AbstractSyncTracker` in `database_builder_libs.models.abstract_sync_tracker`) and a SQLite-backed implementation (`SqliteSyncTracker` in `database_builder_libs.utility.sync._sqlite`) for tracking per-source synchronization state and detecting artifact modification conflicts.
 
 `SqliteSyncTracker` inherits from `SqliteRelationalStore` (`database_builder_libs.stores.sqlite.sqlite_store`), which implements `AbstractRelationalStore` (`database_builder_libs.models.abstract_relational_store`) — a generic CRUD wrapper around SQLite with retry, WAL mode, and schema migration support.
 
@@ -15,9 +13,10 @@ The typical sync workflow has three steps:
 3. **`finish_sync(source_name, artifacts)`** — upsert artifact records, update the source timestamp, and return any conflicting item keys
 
 ```python
-from database_builder_libs.utility.sync import SqliteSyncTracker
+from database_builder_libs.utility.sync._sqlite import SqliteSyncTracker
 
 tracker = SqliteSyncTracker()
+tracker.connect()
 
 last_sync = tracker.start_sync("Zotero")
 last_sync_dt = (
@@ -144,7 +143,7 @@ There are two levels you can implement:
 
 2. **Implement `AbstractSyncTracker` directly** for a completely different storage model:
    ```python
-   from database_builder_libs.utility.sync import AbstractSyncTracker, Artifact, ConflictItem
+   from database_builder_libs.models.abstract_sync_tracker import AbstractSyncTracker, Artifact, ConflictItem
 
    class CustomSyncTracker(AbstractSyncTracker):
        def start_sync(self, source_name: str) -> float | None: ...
