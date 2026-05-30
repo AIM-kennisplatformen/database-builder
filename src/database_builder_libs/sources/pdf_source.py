@@ -15,7 +15,9 @@ from pypdf import PdfReader
 from docling_core.types.doc import SectionHeaderItem, TextItem
 
 from database_builder_libs.models.abstract_chunk_embedder import AbstractChunkEmbedder
-from database_builder_libs.models.abstract_chunk_strategy import AbstractChunkingStrategy
+from database_builder_libs.models.abstract_chunk_strategy import (
+    AbstractChunkingStrategy,
+)
 from database_builder_libs.models.abstract_source import AbstractSource, Content
 from database_builder_libs.models.chunk import Chunk
 from database_builder_libs.utility.chunk.n_points_section import SectionChunkingStrategy
@@ -35,7 +37,7 @@ class Institution:
 @dataclasses.dataclass(slots=True)
 class Acknowledgement:
     name: str
-    type: str      # "person" | "organization" | "group"
+    type: str  # "person" | "organization" | "group"
     relation: str  # "funding" | "collaboration" | "contribution" | "review" | "support"
 
 
@@ -53,10 +55,11 @@ class DocumentMetadata:
     target_groups: Optional[List[str]] = None
     best_practices: Optional[List[str]] = None
 
+
 class ExtractionStrategy(str, Enum):
     FILE_METADATA = "file_metadata"
-    DOCLING       = "docling"
-    LLM           = "llm"
+    DOCLING = "docling"
+    LLM = "llm"
 
 
 class OrderedStrategyConfig(BaseModel):
@@ -146,12 +149,17 @@ class PDFDocumentConfig(BaseModel):
     sections: SectionsConfig = Field(default_factory=SectionsConfig)
 
     llm_base_url: Optional[str] = None
-    llm_api_key:  Optional[str] = None
-    llm_model:    str = "gpt-4.1-mini"
+    llm_api_key: Optional[str] = None
+    llm_model: str = "gpt-4.1-mini"
 
 
-_SUMMARY_HEADERS   = frozenset({"abstract", "summary", "executive summary", "samenvatting"})
-_PDF_META_JUNK     = frozenset({"unknown", "untitled", "microsoft word", "writer", "author"})
+_SUMMARY_HEADERS = frozenset(
+    {"abstract", "summary", "executive summary", "samenvatting"}
+)
+_PDF_META_JUNK = frozenset(
+    {"unknown", "untitled", "microsoft word", "writer", "author"}
+)
+
 
 class PDFSource(AbstractSource[PDFDocumentConfig]):
     """
@@ -177,9 +185,9 @@ class PDFSource(AbstractSource[PDFDocumentConfig]):
         List of :class:`~database_builder_libs.models.chunk.Chunk` dicts.
     """
 
-    _config:     Optional[PDFDocumentConfig]    = PrivateAttr(default=None)
-    _parser:     Optional[DocumentParserDocling] = PrivateAttr(default=None)
-    _llm_client: Any                             = PrivateAttr(default=None)
+    _config: Optional[PDFDocumentConfig] = PrivateAttr(default=None)
+    _parser: Optional[DocumentParserDocling] = PrivateAttr(default=None)
+    _llm_client: Any = PrivateAttr(default=None)
 
     def _connect_impl(self, config: Mapping[str, Any]) -> None:
         self._config = PDFDocumentConfig(**config)
@@ -187,7 +195,7 @@ class PDFSource(AbstractSource[PDFDocumentConfig]):
             raise ValueError(
                 f"folder_path '{self._config.folder_path}' does not exist or is not a directory."
             )
-        self._parser     = DocumentParserDocling()
+        self._parser = DocumentParserDocling()
         self._llm_client = self._build_llm_client()
         logger.info(f"PDFSource connected to folder: {self._config.folder_path}")
 
@@ -200,27 +208,34 @@ class PDFSource(AbstractSource[PDFDocumentConfig]):
             if limit != -1 and len(results) >= limit:
                 break
             stat = pdf_path.stat()
-            results.append({
-                "id":       str(pdf_path.relative_to(self._config.folder_path)),
-                "path":     pdf_path,
-                "size":     stat.st_size,
-                "modified": datetime.fromtimestamp(stat.st_mtime, tz=timezone.utc),
-                "pdf_meta": self._read_pdf_meta(str(pdf_path)),
-            })
+            results.append(
+                {
+                    "id": str(pdf_path.relative_to(self._config.folder_path)),
+                    "path": pdf_path,
+                    "size": stat.st_size,
+                    "modified": datetime.fromtimestamp(stat.st_mtime, tz=timezone.utc),
+                    "pdf_meta": self._read_pdf_meta(str(pdf_path)),
+                }
+            )
         return results
 
-    def get_list_artefacts(self, last_synced: Optional[datetime]) -> list[tuple[str, datetime]]:
+    def get_list_artefacts(
+        self, last_synced: Optional[datetime]
+    ) -> list[tuple[str, datetime]]:
         """Return PDFs modified after ``last_synced``, sorted ascending by mtime."""
         self._ensure_connected()
         assert self._config is not None
         if last_synced is not None and last_synced.tzinfo is None:
             last_synced = last_synced.replace(tzinfo=timezone.utc)
         artefacts = [
-            (str(pdf_path.relative_to(self._config.folder_path)),
-             datetime.fromtimestamp(pdf_path.stat().st_mtime, tz=timezone.utc))
+            (
+                str(pdf_path.relative_to(self._config.folder_path)),
+                datetime.fromtimestamp(pdf_path.stat().st_mtime, tz=timezone.utc),
+            )
             for pdf_path in self._config.folder_path.rglob("*.pdf")
             if last_synced is None
-            or datetime.fromtimestamp(pdf_path.stat().st_mtime, tz=timezone.utc) > last_synced
+            or datetime.fromtimestamp(pdf_path.stat().st_mtime, tz=timezone.utc)
+            > last_synced
         ]
         artefacts.sort(key=lambda artefact: artefact[1])
         logger.info(f"get_list_artefacts: {len(artefacts)} PDF(s) since {last_synced}.")
@@ -231,49 +246,53 @@ class PDFSource(AbstractSource[PDFDocumentConfig]):
         self._ensure_connected()
         assert self._config is not None
         assert self._parser is not None
- 
+
         contents: list[Content] = []
         for relative_id, modified in artefacts:
             pdf_path = self._config.folder_path / relative_id
             if not pdf_path.exists():
                 raise KeyError(f"Artefact '{relative_id}' no longer exists.")
- 
-            stat         = pdf_path.stat()
+
+            stat = pdf_path.stat()
             pdf_path_str = str(pdf_path.resolve())
- 
+
             parsed: Optional[ParsedDocument] = None
             num_pages: Optional[int] = None
             try:
-                parsed    = self._parser.parse(pdf_path_str)
+                parsed = self._parser.parse(pdf_path_str)
                 num_pages = len(parsed.doc.pages) if parsed.doc.pages else None
             except DocumentConversionError as exc:
                 logger.warning(f"Docling conversion failed for '{relative_id}': {exc}")
             except Exception as exc:
                 logger.warning(f"Unexpected parse error for '{relative_id}': {exc}")
- 
+
             metadata = self._extract_metadata(pdf_path_str=pdf_path_str, parsed=parsed)
-            chunks   = self._chunk(parsed=parsed, document_id=relative_id) if (
-                self._config.sections.enabled and parsed is not None
-            ) else []
+            chunks = (
+                self._chunk(parsed=parsed, document_id=relative_id)
+                if (self._config.sections.enabled and parsed is not None)
+                else []
+            )
             if chunks and self._config.sections.embedder is not None:
                 chunks = self._embed(chunks)
- 
-            contents.append(Content(
-                date=modified,
-                id_=relative_id,
-                content={
-                    "file_path":  pdf_path_str,
-                    "file_name":  pdf_path.name,
-                    "file_size":  stat.st_size,
-                    "num_pages":  num_pages,
-                    "pdf_meta":   self._read_pdf_meta(pdf_path_str),
-                    "metadata":   dataclasses.asdict(metadata),
-                    **self._structural_meta(parsed),
-                    "chunks":     [dataclasses.asdict(chunk) for chunk in chunks],
-                },
-            ))
+
+            contents.append(
+                Content(
+                    date=modified,
+                    id_=relative_id,
+                    content={
+                        "file_path": pdf_path_str,
+                        "file_name": pdf_path.name,
+                        "file_size": stat.st_size,
+                        "num_pages": num_pages,
+                        "pdf_meta": self._read_pdf_meta(pdf_path_str),
+                        "metadata": dataclasses.asdict(metadata),
+                        **self._structural_meta(parsed),
+                        "chunks": [dataclasses.asdict(chunk) for chunk in chunks],
+                    },
+                )
+            )
             logger.debug(f"Processed '{relative_id}': {len(chunks)} chunk(s).")
- 
+
         logger.info(f"get_content returning {len(contents)} Content object(s).")
         return contents
 
@@ -288,16 +307,16 @@ class PDFSource(AbstractSource[PDFDocumentConfig]):
         metadata = DocumentMetadata()
         if parsed is None:
             return metadata
- 
+
         try:
             # ── lazy, cached accessors ────────────────────────────────────
             _cache: dict[str, Any] = {}
- 
+
             def lines() -> List[str]:
                 if "lines" not in _cache:
                     _cache["lines"] = self._first_lines(parsed.doc, limit=120)
                 return _cache["lines"]
- 
+
             def pdf_info() -> dict[str, Any]:
                 if "pdf_info" not in _cache:
                     try:
@@ -307,8 +326,10 @@ class PDFSource(AbstractSource[PDFDocumentConfig]):
                             if isinstance(key, str):
                                 info[key.lstrip("/")] = value
                         for attr_name, dict_key in (
-                            ("title", "Title"), ("author", "Author"),
-                            ("producer", "Producer"), ("creator", "Creator"),
+                            ("title", "Title"),
+                            ("author", "Author"),
+                            ("producer", "Producer"),
+                            ("creator", "Creator"),
                         ):
                             if dict_key not in info:
                                 attr_value = getattr(raw_pdf_metadata, attr_name, None)
@@ -318,30 +339,37 @@ class PDFSource(AbstractSource[PDFDocumentConfig]):
                     except Exception:
                         _cache["pdf_info"] = {}
                 return _cache["pdf_info"]
- 
+
             def llm() -> dict[str, Any]:
                 if "llm" not in _cache:
                     _cache["llm"] = self._call_llm(lines()) if self._llm_client else {}
                 return _cache["llm"]
 
-            def _extract_title(strategy: ExtractionStrategy) -> Optional[Tuple[Any, str]]:
+            def _extract_title(
+                strategy: ExtractionStrategy,
+            ) -> Optional[Tuple[Any, str]]:
                 if strategy == ExtractionStrategy.FILE_METADATA:
                     title = self._clean_meta_string(pdf_info().get("Title"))
                     return (title, "pdf_metadata") if title else None
                 if strategy == ExtractionStrategy.DOCLING:
-                    title = (
-                        self._first_section_header(parsed.doc)
-                        or self._first_reasonable_line(lines())
-                    )
+                    title = self._first_section_header(
+                        parsed.doc
+                    ) or self._first_reasonable_line(lines())
                     return (title, "docling_heuristic") if title else None
                 if strategy == ExtractionStrategy.LLM and self._llm_client:
                     title = llm().get("title")
                     return (title, "llm") if title else None
- 
-            def _extract_authors(strategy: ExtractionStrategy) -> Optional[Tuple[Any, str]]:
+
+            def _extract_authors(
+                strategy: ExtractionStrategy,
+            ) -> Optional[Tuple[Any, str]]:
                 if strategy == ExtractionStrategy.FILE_METADATA:
                     raw_author = self._clean_meta_string(pdf_info().get("Author"))
-                    return (self._split_authors(raw_author), "pdf_metadata") if raw_author else None
+                    return (
+                        (self._split_authors(raw_author), "pdf_metadata")
+                        if raw_author
+                        else None
+                    )
                 if strategy == ExtractionStrategy.DOCLING:
                     for line in lines()[:10]:
                         parsed_authors = self._parse_author_line(line)
@@ -350,27 +378,39 @@ class PDFSource(AbstractSource[PDFDocumentConfig]):
                 if strategy == ExtractionStrategy.LLM and self._llm_client:
                     authors = llm().get("authors")
                     return (authors, "llm") if authors else None
- 
-            def _extract_summary(strategy: ExtractionStrategy) -> Optional[Tuple[Any, str]]:
+
+            def _extract_summary(
+                strategy: ExtractionStrategy,
+            ) -> Optional[Tuple[Any, str]]:
                 if strategy == ExtractionStrategy.DOCLING:
                     summary = self._find_summary(parsed.doc)
                     return (summary, "docling_heuristic") if summary else None
                 if strategy == ExtractionStrategy.LLM and self._llm_client:
                     summary = llm().get("summary")
                     return (summary, "llm") if summary else None
- 
-            def _extract_institute(strategy: ExtractionStrategy) -> Optional[Tuple[Any, str]]:
+
+            def _extract_institute(
+                strategy: ExtractionStrategy,
+            ) -> Optional[Tuple[Any, str]]:
                 if strategy == ExtractionStrategy.FILE_METADATA:
                     raw_name = self._clean_meta_string(
                         pdf_info().get("Producer") or pdf_info().get("Creator")
                     )
-                    if raw_name and not any(junk in raw_name.lower() for junk in _PDF_META_JUNK):
+                    if raw_name and not any(
+                        junk in raw_name.lower() for junk in _PDF_META_JUNK
+                    ):
                         return (Institution(name=raw_name), "pdf_metadata")
                 if strategy == ExtractionStrategy.LLM and self._llm_client:
                     institute_name = llm().get("publishing_institute")
-                    return (Institution(name=institute_name), "llm") if institute_name else None
- 
-            def _extract_acknowledgements(strategy: ExtractionStrategy) -> Optional[Tuple[Any, str]]:
+                    return (
+                        (Institution(name=institute_name), "llm")
+                        if institute_name
+                        else None
+                    )
+
+            def _extract_acknowledgements(
+                strategy: ExtractionStrategy,
+            ) -> Optional[Tuple[Any, str]]:
                 if strategy == ExtractionStrategy.LLM and self._llm_client:
                     acknowledgements = [
                         Acknowledgement(
@@ -382,16 +422,24 @@ class PDFSource(AbstractSource[PDFDocumentConfig]):
                         if entry.get("name")
                     ]
                     return (acknowledgements, "llm") if acknowledgements else None
- 
+
             # ── run each field through its strategy cascade ───────────────
             fields = [
-                (self._config.title,                _extract_title,            "title"),
-                (self._config.authors,              _extract_authors,          "authors"),
-                (self._config.summary,              _extract_summary,          "summary"),
-                (self._config.publishing_institute, _extract_institute,        "publishing_institute"),
-                (self._config.acknowledgements,     _extract_acknowledgements, "acknowledgements"),
+                (self._config.title, _extract_title, "title"),
+                (self._config.authors, _extract_authors, "authors"),
+                (self._config.summary, _extract_summary, "summary"),
+                (
+                    self._config.publishing_institute,
+                    _extract_institute,
+                    "publishing_institute",
+                ),
+                (
+                    self._config.acknowledgements,
+                    _extract_acknowledgements,
+                    "acknowledgements",
+                ),
             ]
- 
+
             for field_config, extractor, field_name in fields:
                 if not field_config.enabled:
                     continue
@@ -403,12 +451,11 @@ class PDFSource(AbstractSource[PDFDocumentConfig]):
                         metadata.source[field_name] = source_label
                         if field_config.strategies.stop_on_success:
                             break
- 
+
         except Exception as exc:
             logger.warning(f"Metadata extraction failed for '{pdf_path_str}': {exc}")
- 
+
         return metadata
- 
 
     def _build_llm_client(self) -> Optional[Any]:
         assert self._config is not None
@@ -416,7 +463,10 @@ class PDFSource(AbstractSource[PDFDocumentConfig]):
             return None
         try:
             from openai import OpenAI
-            return OpenAI(base_url=self._config.llm_base_url, api_key=self._config.llm_api_key)
+
+            return OpenAI(
+                base_url=self._config.llm_base_url, api_key=self._config.llm_api_key
+            )
         except ImportError:
             logger.warning("openai package not installed; LLM extraction skipped.")
             return None
@@ -448,13 +498,13 @@ Text:
 {chr(10).join(lines[:60])}
 """
         try:
-            res     = self._llm_client.chat.completions.create(
+            res = self._llm_client.chat.completions.create(
                 model=self._config.llm_model,
                 temperature=0,
                 messages=[{"role": "user", "content": prompt}],
             )
             content = res.choices[0].message.content.strip()
-            match   = re.search(r"\{.*\}", content, re.S)
+            match = re.search(r"\{.*\}", content, re.S)
             return json.loads(match.group(0)) if match else {}
         except Exception as exc:
             logger.warning(f"LLM call failed: {exc}")
@@ -472,14 +522,25 @@ Text:
                             return out
         return out
 
-    _TITLE_NOISE = frozenset({
-        "university of huddersfield repository", "original citation", "repository",
-        "preprint", "author's accepted manuscript", "accepted manuscript", "post-print",
-    })
+    _TITLE_NOISE = frozenset(
+        {
+            "university of huddersfield repository",
+            "original citation",
+            "repository",
+            "preprint",
+            "author's accepted manuscript",
+            "accepted manuscript",
+            "post-print",
+        }
+    )
 
     @classmethod
     def _looks_like_title(cls, assumed_title: str) -> bool:
-        if len(assumed_title) < 8 or "@" in assumed_title or len(assumed_title.split()) < 2:
+        if (
+            len(assumed_title) < 8
+            or "@" in assumed_title
+            or len(assumed_title.split()) < 2
+        ):
             return False
         if assumed_title == assumed_title.upper() and len(assumed_title) > 30:
             return False
@@ -529,13 +590,17 @@ Text:
         except Exception as exc:
             logger.warning(f"Could not read PDF metadata for '{pdf_path_str}': {exc}")
         return {}
-    
+
     @staticmethod
     def _clean_meta_string(value: Any) -> Optional[str]:
         if value is None:
             return None
         filtered_str = str(value).strip()
-        if not filtered_str or filtered_str.lower() in _PDF_META_JUNK or filtered_str.lower().startswith("microsoft word"):
+        if (
+            not filtered_str
+            or filtered_str.lower() in _PDF_META_JUNK
+            or filtered_str.lower().startswith("microsoft word")
+        ):
             return None
         return filtered_str
 
@@ -544,7 +609,9 @@ Text:
         if ";" in author_string:
             parts = [part.strip() for part in author_string.split(";")]
         elif re.search(r"\band\b", author_string, flags=re.I):
-            parts = [part.strip() for part in re.split(r"\band\b", author_string, flags=re.I)]
+            parts = [
+                part.strip() for part in re.split(r"\band\b", author_string, flags=re.I)
+            ]
         else:
             parts = [author_string.strip()]
         return [part for part in parts if part]
@@ -585,15 +652,19 @@ Text:
         except Exception as exc:
             logger.warning(f"Embedding failed; returning chunks without vectors: {exc}")
             return chunks
- 
+
     @staticmethod
     def _structural_meta(parsed: Optional[ParsedDocument]) -> dict[str, Any]:
         if parsed is None:
-            return {"num_sections": 0, "num_tables": 0, "num_figures": 0, "section_titles": []}
+            return {
+                "num_sections": 0,
+                "num_tables": 0,
+                "num_figures": 0,
+                "section_titles": [],
+            }
         return {
-            "num_sections":   len(parsed.sections),
-            "num_tables":     len(parsed.tables),
-            "num_figures":    len(parsed.figures),
+            "num_sections": len(parsed.sections),
+            "num_tables": len(parsed.tables),
+            "num_figures": len(parsed.figures),
             "section_titles": [title for title, _, _ in parsed.sections if title],
         }
- 

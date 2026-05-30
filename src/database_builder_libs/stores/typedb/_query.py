@@ -7,7 +7,9 @@ from database_builder_libs.stores.typedb._types import RelationRef
 
 
 class TypeDbQueryMixin(TypeDbBase):
-    def _build_match(self, entity_type: str | None, attrs: Mapping[str, str] | None) -> str:
+    def _build_match(
+        self, entity_type: str | None, attrs: Mapping[str, str] | None
+    ) -> str:
         """Build a TypeQL match block for a specific entity type and its attributes."""
         clauses = []
 
@@ -21,7 +23,9 @@ class TypeDbQueryMixin(TypeDbBase):
 
         return ", ".join(clauses)
 
-    def _build_relation_match(self, relation_type: str | None, attrs: Mapping[str, str] | None) -> str:
+    def _build_relation_match(
+        self, relation_type: str | None, attrs: Mapping[str, str] | None
+    ) -> str:
         """Build a TypeQL match block for a specific relation type and its attributes."""
         clauses = []
 
@@ -52,7 +56,9 @@ class TypeDbQueryMixin(TypeDbBase):
             elif isinstance(value, float):
                 clauses.append(f"has {attr} {value}")
             else:
-                raise TypeError(f"Unsupported value for attribute {attr}: {type(value)}")
+                raise TypeError(
+                    f"Unsupported value for attribute {attr}: {type(value)}"
+                )
 
         return ", ".join(clauses)
 
@@ -116,7 +122,9 @@ class TypeDbQueryMixin(TypeDbBase):
             has {ref["key_attr"]} "{ref["key"]}";
         """
 
-    def _build_entity_relation_query(self, node: Node, relation_player_counts: list[int]) -> str:
+    def _build_entity_relation_query(
+        self, node: Node, relation_player_counts: list[int]
+    ) -> str:
         """
         Build a query that matches relations for `node` where the relation has
         any of the given numbers of *other* players.
@@ -150,7 +158,7 @@ class TypeDbQueryMixin(TypeDbBase):
 
             branch = f"""
             {{
-                {' '.join(other_players)}
+                {" ".join(other_players)}
                 $rel isa $rel_type, links ({links});
                 fetch {{
                     {",".join(fetch_players)},

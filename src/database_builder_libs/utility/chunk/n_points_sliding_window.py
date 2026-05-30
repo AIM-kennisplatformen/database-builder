@@ -1,10 +1,14 @@
 from __future__ import annotations
- 
+
 from dataclasses import dataclass
 from typing import Sequence
- 
+
 from database_builder_libs.models.chunk import Chunk
-from database_builder_libs.models.abstract_chunk_strategy import AbstractChunkingStrategy, RawSection
+from database_builder_libs.models.abstract_chunk_strategy import (
+    AbstractChunkingStrategy,
+    RawSection,
+)
+
 
 @dataclass(slots=True)
 class SlidingWindowChunkingStrategy(AbstractChunkingStrategy):
@@ -104,4 +108,3 @@ class SlidingWindowChunkingStrategy(AbstractChunkingStrategy):
             start = next_start
 
         return [w for w in windows if w]
-

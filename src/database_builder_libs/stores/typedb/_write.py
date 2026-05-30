@@ -36,7 +36,9 @@ class TypeDbWriteMixin(TypeDbBase):
         if self._relation_exists(rel):
             return
 
-        match_roles = [self._match_relation_ref(role, ref) for role, ref in rel["roles"].items()]
+        match_roles = [
+            self._match_relation_ref(role, ref) for role, ref in rel["roles"].items()
+        ]
         insert_roles = [f"{role}: ${role}" for role in rel["roles"]]
 
         attrs = self._format_attributes(attributes)

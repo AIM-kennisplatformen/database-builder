@@ -31,7 +31,9 @@ class TypeDbReadMixin(TypeDbBase):
         role_map = rel["roles"]
         attributes = rel.get("attributes", {})
 
-        match_roles = [self._match_relation_ref(role, ref) for role, ref in role_map.items()]
+        match_roles = [
+            self._match_relation_ref(role, ref) for role, ref in role_map.items()
+        ]
 
         attr_match = ""
         if attributes != {}:
@@ -180,7 +182,9 @@ class TypeDbReadMixin(TypeDbBase):
 
                 for player in row.get("players", []):
                     role_label = player.get("role").get("label")
-                    role = role_label.split(":")[-1] if ":" in role_label else role_label
+                    role = (
+                        role_label.split(":")[-1] if ":" in role_label else role_label
+                    )
                     player_type = player.get("type").get("label")
                     data = player.get("data")
 
@@ -212,7 +216,9 @@ class TypeDbReadMixin(TypeDbBase):
 
         return relations_by_node
 
-    def _fetch_to_nodes(self: "TypeDbDatastore", rows: list[dict], include_relations: bool = False) -> list[Node]:
+    def _fetch_to_nodes(
+        self: "TypeDbDatastore", rows: list[dict], include_relations: bool = False
+    ) -> list[Node]:
         """Convert raw concept document rows to canonical Node objects."""
         nodes: list[Node] = []
 
@@ -232,7 +238,9 @@ class TypeDbReadMixin(TypeDbBase):
                 for attr_name, values in entity_data.items():
                     if attr_name == "type" or not values:
                         continue
-                    payload[attr_name] = values[0]["value"] if isinstance(values, list) else values
+                    payload[attr_name] = (
+                        values[0]["value"] if isinstance(values, list) else values
+                    )
 
                 if not payload:
                     continue
@@ -266,7 +274,9 @@ class TypeDbReadMixin(TypeDbBase):
 
         return nodes
 
-    def _fetch_to_relations(self: "TypeDbDatastore", rows: list[dict]) -> list[RelationData]:
+    def _fetch_to_relations(
+        self: "TypeDbDatastore", rows: list[dict]
+    ) -> list[RelationData]:
         """Convert raw concept document rows to RelationData objects."""
         relations: list[RelationData] = []
 
@@ -276,7 +286,11 @@ class TypeDbReadMixin(TypeDbBase):
                 continue
 
             rel_type_obj = rel.get("type", {})
-            rel_type = rel_type_obj.get("label") if isinstance(rel_type_obj, dict) else str(rel_type_obj)
+            rel_type = (
+                rel_type_obj.get("label")
+                if isinstance(rel_type_obj, dict)
+                else str(rel_type_obj)
+            )
             rel_data = rel.get("data", {})
 
             roles: dict[str, RelationRef] = {}
@@ -397,7 +411,7 @@ class TypeDbReadMixin(TypeDbBase):
         for row in result:
             rel_label = row.get("t").get("label")
 
-            if rel_label == 'relation':
+            if rel_label == "relation":
                 continue
 
             query = f"""
@@ -485,7 +499,9 @@ class TypeDbReadMixin(TypeDbBase):
 
         return self._fetch_to_nodes(list(rows), include_relations=include_relations)
 
-    def get_relations(self: "TypeDbDatastore", filter: str | None) -> list[RelationData]:
+    def get_relations(
+        self: "TypeDbDatastore", filter: str | None
+    ) -> list[RelationData]:
         """
         Retrieve relations using a filter query.
 

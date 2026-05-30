@@ -1,10 +1,14 @@
 from __future__ import annotations
- 
+
 from dataclasses import dataclass
 from typing import Sequence
- 
+
 from database_builder_libs.models.chunk import Chunk
-from database_builder_libs.models.abstract_chunk_strategy import AbstractChunkingStrategy, RawSection
+from database_builder_libs.models.abstract_chunk_strategy import (
+    AbstractChunkingStrategy,
+    RawSection,
+)
+
 
 @dataclass(slots=True)
 class SectionChunkingStrategy(AbstractChunkingStrategy):
@@ -46,7 +50,9 @@ class SectionChunkingStrategy(AbstractChunkingStrategy):
             if len(text) < self.min_chars:
                 continue
 
-            body = f"{title}\n{text}" if (self.include_title_in_text and title) else text
+            body = (
+                f"{title}\n{text}" if (self.include_title_in_text and title) else text
+            )
 
             chunks.append(
                 Chunk(

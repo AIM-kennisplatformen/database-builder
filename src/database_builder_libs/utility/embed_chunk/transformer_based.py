@@ -80,10 +80,14 @@ class TransformersChunkEmbedder(AbstractChunkEmbedder):
             with torch.no_grad():
                 output = self._model(**encoded)
 
-            vectors = self._mean_pool(
-                output.last_hidden_state,
-                attention_mask,
-            ).cpu().tolist()
+            vectors = (
+                self._mean_pool(
+                    output.last_hidden_state,
+                    attention_mask,
+                )
+                .cpu()
+                .tolist()
+            )
 
             embedded.extend(
                 Chunk(
