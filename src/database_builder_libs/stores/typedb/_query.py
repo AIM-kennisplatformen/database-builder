@@ -1,9 +1,50 @@
+import re
+
 from typing import Mapping
 from urllib.parse import parse_qs
 
 from database_builder_libs.models.node import Node
 from database_builder_libs.stores.typedb._base import TypeDbBase
 from database_builder_libs.stores.typedb._types import RelationRef
+
+
+_VALID_IDENTIFIER = re.compile(r"^[a-zA-Z_][a-zA-Z0-9_-]*$")
+
+
+def _validate_identifier(name: str, label: str = "identifier") -> str:
+    """Validate a TypeDB schema identifier.
+
+    Ensures the name is a non-empty string matching TypeDB's identifier pattern
+    (alphanumeric, underscore, hyphen; must start with letter or underscore).
+
+    Returns the name unchanged on success.
+    Raises ValueError if invalid.
+    """
+    if not isinstance(name, str) or not name:
+        raise ValueError(f"Invalid {label}: must be a non-empty string")
+    if not _VALID_IDENTIFIER.match(name):
+        raise ValueError(
+            f"Invalid TypeDB {label}: {name!r}. Must match {_VALID_IDENTIFIER.pattern}"
+        )
+    return name
+
+
+def _escape_string(value: str) -> str:
+    """Escape a string value for safe embedding in a TypeQL double-quoted literal.
+
+    Escapes backslash and double-quote characters.
+    Rejects control characters (except tab).
+
+    Returns the escaped string.
+    Raises ValueError if value contains control characters.
+    """
+    escaped = value.replace("\\", "\\\\").replace('"', '\\"')
+    for char in escaped:
+        if ord(char) < 0x20 and char not in ("\t",):
+            raise ValueError(
+                f"Invalid control character U+{ord(char):04X} in string value"
+            )
+    return escaped
 
 
 class TypeDbQueryMixin(TypeDbBase):
@@ -14,7 +55,7 @@ class TypeDbQueryMixin(TypeDbBase):
         clauses = []
 
         if entity_type:
-            clauses.append(f"$e isa {entity_type}")
+            clauses.append(f"$e isa {_validate_identifier(entity_type, 'entity type')}")
         else:
             clauses.append("$e isa entity")
 
@@ -30,7 +71,9 @@ class TypeDbQueryMixin(TypeDbBase):
         clauses = []
 
         if relation_type:
-            clauses.append(f"$rel isa {relation_type}")
+            clauses.append(
+                f"$rel isa {_validate_identifier(relation_type, 'relation type')}"
+            )
         else:
             clauses.append("$rel isa relation")
 
@@ -47,8 +90,9 @@ class TypeDbQueryMixin(TypeDbBase):
             if value is None:
                 continue
 
+            _validate_identifier(attr, "attribute name")
             if isinstance(value, str):
-                clauses.append(f'has {attr} "{value}"')
+                clauses.append(f'has {attr} "{_escape_string(value)}"')
             elif isinstance(value, bool):
                 clauses.append(f"has {attr} {str(value).lower()}")
             elif isinstance(value, int):
@@ -67,6 +111,7 @@ class TypeDbQueryMixin(TypeDbBase):
         clauses = []
 
         for attr, value in attrs.items():
+            _validate_identifier(attr, "attribute name")
             try:
                 int_val = int(value)
                 clauses.append(f"has {attr} {int_val}")
@@ -75,7 +120,7 @@ class TypeDbQueryMixin(TypeDbBase):
                     float_val = float(value)
                     clauses.append(f"has {attr} {float_val}")
                 except (ValueError, TypeError):
-                    clauses.append(f'has {attr} "{value}"')
+                    clauses.append(f'has {attr} "{_escape_string(value)}"')
 
         return ",\n       ".join(clauses)
 
@@ -118,8 +163,8 @@ class TypeDbQueryMixin(TypeDbBase):
     def _match_relation_ref(self, role: str, ref: RelationRef) -> str:
         """Format a TypeQL match block for a specific relation role reference."""
         return f"""
-        ${role} isa {ref["entity_type"]},
-            has {ref["key_attr"]} "{ref["key"]}";
+        ${_validate_identifier(role, "role")} isa {_validate_identifier(ref["entity_type"], "entity type")},
+            has {_validate_identifier(ref["key_attr"], "attribute name")} "{_escape_string(ref["key"])}";
         """
 
     def _build_entity_relation_query(
@@ -173,7 +218,7 @@ class TypeDbQueryMixin(TypeDbBase):
 
         query = f"""
         match
-            $e isa {node.entity_type}, has {node.key_attribute} "{node.id}";
+            $e isa {_validate_identifier(node.entity_type, "entity type")}, has {_validate_identifier(node.key_attribute, "attribute name")} "{_escape_string(node.id)}";
         {chr(10).join(f"or {b}" if i > 0 else b for i, b in enumerate(branches))}
         """
 

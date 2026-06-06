@@ -2,6 +2,7 @@ import re
 from typing import Mapping
 
 from database_builder_libs.stores.typedb._base import TypeDbBase
+from database_builder_libs.stores.typedb._query import _validate_identifier
 
 
 class TypeDbSchemaMixin(TypeDbBase):
@@ -72,7 +73,7 @@ class TypeDbSchemaMixin(TypeDbBase):
 
         query = f"""
         match
-            {entity_type} owns $a;
+            {_validate_identifier(entity_type, 'entity_type')} owns $a;
         fetch {{
             "a": $a
         }};
