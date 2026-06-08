@@ -2,7 +2,7 @@ import re
 from typing import Mapping
 
 from database_builder_libs.stores.typedb._base import TypeDbBase
-from database_builder_libs.stores.typedb._query import _validate_identifier
+from database_builder_libs.stores.typedb._base import _validate_identifier
 
 
 class TypeDbSchemaMixin(TypeDbBase):

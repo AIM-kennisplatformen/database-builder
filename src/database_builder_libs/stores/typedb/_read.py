@@ -4,10 +4,7 @@ from typedb.driver import Transaction, TransactionType
 
 from database_builder_libs.models.node import EntityType, KeyAttribute, Node, NodeId
 from database_builder_libs.stores.typedb._base import TypeDbBase
-from database_builder_libs.stores.typedb._query import (
-    _escape_string,
-    _validate_identifier,
-)
+from database_builder_libs.stores.typedb._base import _escape_string, _validate_identifier
 from database_builder_libs.stores.typedb._types import RelationData, RelationRef
 from typing import Mapping, TYPE_CHECKING
 

@@ -8,10 +8,7 @@ from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from database_builder_libs.stores.typedb.typedb_store import TypeDbDatastore
 
-from database_builder_libs.stores.typedb._query import (
-    _validate_identifier,
-    _escape_string,
-)
+from database_builder_libs.stores.typedb._base import _escape_string, _validate_identifier
 
 
 class TypeDbWriteMixin(TypeDbBase):
