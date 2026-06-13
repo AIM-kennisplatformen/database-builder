@@ -3,7 +3,11 @@ from database_builder_libs.stores.typedb._types import (
     RelationData,
     EagerQueryAnswer,
 )
-from database_builder_libs.stores.typedb._base import TypeDbBase
+from database_builder_libs.stores.typedb._base import (
+    TypeDbBase,
+    escape_string,
+    validate_identifier,
+)
 from database_builder_libs.stores.typedb._schema import TypeDbSchemaMixin
 from database_builder_libs.stores.typedb._query import TypeDbQueryMixin
 from database_builder_libs.stores.typedb._read import TypeDbReadMixin
@@ -81,4 +85,6 @@ __all__ = [
     "RelationRef",
     "RelationData",
     "EagerQueryAnswer",
+    "escape_string",
+    "validate_identifier",
 ]

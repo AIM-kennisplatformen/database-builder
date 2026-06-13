@@ -8,7 +8,7 @@ from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from database_builder_libs.stores.typedb.typedb_store import TypeDbDatastore
 
-from database_builder_libs.stores.typedb._base import _escape_string, _validate_identifier
+from database_builder_libs.stores.typedb._base import escape_string, validate_identifier
 
 
 class TypeDbWriteMixin(TypeDbBase):
@@ -24,8 +24,8 @@ class TypeDbWriteMixin(TypeDbBase):
 
         query = f"""
         insert
-            $e isa {_validate_identifier(entity_type, "entity type")},
-            has {_validate_identifier(key_attr, "attribute name")} "{_escape_string(key_value)}"
+            $e isa {validate_identifier(entity_type, "entity type")},
+            has {validate_identifier(key_attr, "attribute name")} "{escape_string(key_value)}"
             {", " if attrs else ""}{attrs};
         """
 
@@ -49,7 +49,7 @@ class TypeDbWriteMixin(TypeDbBase):
         match
             {"".join(match_roles)}
         insert
-            ({", ".join(insert_roles)}) isa {_validate_identifier(rel["type"], "relation type")}
+            ({", ".join(insert_roles)}) isa {validate_identifier(rel["type"], "relation type")}
             {", " + attrs if attrs else ""};
         """
 

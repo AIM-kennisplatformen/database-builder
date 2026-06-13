@@ -20,7 +20,7 @@ from database_builder_libs.stores.typedb._types import EagerQueryAnswer
 _VALID_IDENTIFIER = re.compile(r"^[a-zA-Z_][a-zA-Z0-9_-]*$")
 
 
-def _validate_identifier(name: str, label: str = "identifier") -> str:
+def validate_identifier(name: str, label: str = "identifier") -> str:
     """Validate a TypeDB schema identifier.
 
     Ensures the name is a non-empty string matching TypeDB's identifier pattern
@@ -38,7 +38,7 @@ def _validate_identifier(name: str, label: str = "identifier") -> str:
     return name
 
 
-def _escape_string(value: str) -> str:
+def escape_string(value: str) -> str:
     """Escape a string value for safe embedding in a TypeQL double-quoted literal.
 
     Escapes backslash and double-quote characters.
