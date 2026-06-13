@@ -2,7 +2,11 @@ from typing import Mapping
 from urllib.parse import parse_qs
 
 from database_builder_libs.models.node import Node
-from database_builder_libs.stores.typedb._base import TypeDbBase
+from database_builder_libs.stores.typedb._base import (
+    TypeDbBase,
+    escape_string,
+    validate_identifier,
+)
 from database_builder_libs.stores.typedb._types import RelationRef
 
 
@@ -14,7 +18,7 @@ class TypeDbQueryMixin(TypeDbBase):
         clauses = []
 
         if entity_type:
-            clauses.append(f"$e isa {entity_type}")
+            clauses.append(f"$e isa {validate_identifier(entity_type, 'entity type')}")
         else:
             clauses.append("$e isa entity")
 
@@ -30,7 +34,9 @@ class TypeDbQueryMixin(TypeDbBase):
         clauses = []
 
         if relation_type:
-            clauses.append(f"$rel isa {relation_type}")
+            clauses.append(
+                f"$rel isa {validate_identifier(relation_type, 'relation type')}"
+            )
         else:
             clauses.append("$rel isa relation")
 
@@ -47,8 +53,9 @@ class TypeDbQueryMixin(TypeDbBase):
             if value is None:
                 continue
 
+            validate_identifier(attr, "attribute name")
             if isinstance(value, str):
-                clauses.append(f'has {attr} "{value}"')
+                clauses.append(f'has {attr} "{escape_string(value)}"')
             elif isinstance(value, bool):
                 clauses.append(f"has {attr} {str(value).lower()}")
             elif isinstance(value, int):
@@ -67,6 +74,7 @@ class TypeDbQueryMixin(TypeDbBase):
         clauses = []
 
         for attr, value in attrs.items():
+            validate_identifier(attr, "attribute name")
             try:
                 int_val = int(value)
                 clauses.append(f"has {attr} {int_val}")
@@ -75,7 +83,7 @@ class TypeDbQueryMixin(TypeDbBase):
                     float_val = float(value)
                     clauses.append(f"has {attr} {float_val}")
                 except (ValueError, TypeError):
-                    clauses.append(f'has {attr} "{value}"')
+                    clauses.append(f'has {attr} "{escape_string(value)}"')
 
         return ",\n       ".join(clauses)
 
@@ -118,8 +126,8 @@ class TypeDbQueryMixin(TypeDbBase):
     def _match_relation_ref(self, role: str, ref: RelationRef) -> str:
         """Format a TypeQL match block for a specific relation role reference."""
         return f"""
-        ${role} isa {ref["entity_type"]},
-            has {ref["key_attr"]} "{ref["key"]}";
+        ${validate_identifier(role, "role")} isa {validate_identifier(ref["entity_type"], "entity type")},
+            has {validate_identifier(ref["key_attr"], "attribute name")} "{escape_string(ref["key"])}";
         """
 
     def _build_entity_relation_query(
@@ -173,7 +181,7 @@ class TypeDbQueryMixin(TypeDbBase):
 
         query = f"""
         match
-            $e isa {node.entity_type}, has {node.key_attribute} "{node.id}";
+            $e isa {validate_identifier(node.entity_type, "entity type")}, has {validate_identifier(node.key_attribute, "attribute name")} "{escape_string(node.id)}";
         {chr(10).join(f"or {b}" if i > 0 else b for i, b in enumerate(branches))}
         """
 

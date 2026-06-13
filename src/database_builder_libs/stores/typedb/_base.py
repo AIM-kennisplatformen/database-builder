@@ -1,3 +1,4 @@
+import re
 from contextlib import contextmanager
 from pathlib import Path
 from typing import Generator
@@ -14,6 +15,45 @@ from typedb.driver import (
 
 from database_builder_libs.models.abstract_store import AbstractStore
 from database_builder_libs.stores.typedb._types import EagerQueryAnswer
+
+
+_VALID_IDENTIFIER = re.compile(r"^[a-zA-Z_][a-zA-Z0-9_-]*$")
+
+
+def validate_identifier(name: str, label: str = "identifier") -> str:
+    """Validate a TypeDB schema identifier.
+
+    Ensures the name is a non-empty string matching TypeDB's identifier pattern
+    (alphanumeric, underscore, hyphen; must start with letter or underscore).
+
+    Returns the name unchanged on success.
+    Raises ValueError if invalid.
+    """
+    if not isinstance(name, str) or not name:
+        raise ValueError(f"Invalid {label}: must be a non-empty string")
+    if not _VALID_IDENTIFIER.match(name):
+        raise ValueError(
+            f"Invalid TypeDB {label}: {name!r}. Must match {_VALID_IDENTIFIER.pattern}"
+        )
+    return name
+
+
+def escape_string(value: str) -> str:
+    """Escape a string value for safe embedding in a TypeQL double-quoted literal.
+
+    Escapes backslash and double-quote characters.
+    Rejects control characters (except tab).
+
+    Returns the escaped string.
+    Raises ValueError if value contains control characters.
+    """
+    escaped = value.replace("\\", "\\\\").replace('"', '\\"')
+    for char in escaped:
+        if ord(char) < 0x20 and char not in ("\t",):
+            raise ValueError(
+                f"Invalid control character U+{ord(char):04X} in string value"
+            )
+    return escaped
 
 
 class TypeDbBase(AbstractStore):

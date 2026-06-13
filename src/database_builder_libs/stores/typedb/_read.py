@@ -4,6 +4,7 @@ from typedb.driver import Transaction, TransactionType
 
 from database_builder_libs.models.node import EntityType, KeyAttribute, Node, NodeId
 from database_builder_libs.stores.typedb._base import TypeDbBase
+from database_builder_libs.stores.typedb._base import escape_string, validate_identifier
 from database_builder_libs.stores.typedb._types import RelationData, RelationRef
 from typing import Mapping, TYPE_CHECKING
 
@@ -17,8 +18,8 @@ class TypeDbReadMixin(TypeDbBase):
 
         query = f"""
         match
-            $e isa {entity_type},
-                has {key_attr} "{key_value}";
+            $e isa {validate_identifier(entity_type, "entity type")},
+                has {validate_identifier(key_attr, "attribute name")} "{escape_string(key_value)}";
         limit 1;
         """
 
@@ -42,7 +43,7 @@ class TypeDbReadMixin(TypeDbBase):
         query = f"""
         match
             {" ".join(match_roles)}
-            $r ({", ".join(f"{r}: ${r}" for r in role_map)}) isa {rel["type"]}
+            $r ({", ".join(f"{r}: ${r}" for r in role_map)}) isa {validate_identifier(rel["type"], "relation type")}
             {attr_match};
         limit 1;
         """
@@ -73,8 +74,8 @@ class TypeDbReadMixin(TypeDbBase):
 
         query = f"""
         match
-            $e isa {entity_type},
-                has {key_attr} "{key_value}";
+            $e isa {validate_identifier(entity_type, "entity type")},
+                has {validate_identifier(key_attr, "attribute name")} "{escape_string(key_value)}";
             $r ($role: $e, $other_role: $x) isa $rel_type;
         get $r, $x, $rel_type;
         """
@@ -151,7 +152,7 @@ class TypeDbReadMixin(TypeDbBase):
 
             query = f"""
             match
-                $p isa {node.entity_type}, has {node.key_attribute} "{node.id}";
+                $p isa {validate_identifier(node.entity_type, "entity type")}, has {validate_identifier(node.key_attribute, "attribute name")} "{escape_string(node.id)}";
                 $rel links ($p);
                 $rel isa! $rel_type;
             fetch {{
@@ -292,6 +293,8 @@ class TypeDbReadMixin(TypeDbBase):
                 else str(rel_type_obj)
             )
             rel_data = rel.get("data", {})
+            if not isinstance(rel_type, str):
+                continue
 
             roles: dict[str, RelationRef] = {}
 
@@ -380,10 +383,10 @@ class TypeDbReadMixin(TypeDbBase):
 
             query = f"""
             match
-                $e isa {entity_label};
+                $e isa {validate_identifier(entity_label, "entity type")};
             fetch {{
                 'data': {{ $e.* }},
-                'entity_type': '{entity_label}',
+                'entity_type': '{escape_string(entity_label)}',
             }};
             """
 
@@ -416,7 +419,7 @@ class TypeDbReadMixin(TypeDbBase):
 
             query = f"""
             match
-                $rel isa {rel_label};
+                $rel isa {validate_identifier(rel_label, "relation type")};
                 $rel isa! $rel_type;
             fetch {{
                 'relation': {{
@@ -492,7 +495,7 @@ class TypeDbReadMixin(TypeDbBase):
             {match_block};
         fetch {{
             'data': {{$e.*}},
-            'entity_type': '{entity_type}',
+            'entity_type': '{escape_string(entity_type)}',
         }};
         """
         rows = self.query_read(query).as_concept_documents()
